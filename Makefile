@@ -5,16 +5,12 @@ BUILD 	:= build
 
 
 lox:
-	g++ $(SRC)/lox.cpp -o $(BUILD)/lox
+	g++ -o $(BUILD)/lox -I include $(SRC)/lox.cpp 
 	cp $(BUILD)/lox lox
 
 
 setup:
 	mkdir -p $(BUILD)
-
-
-run:
-	$(BUILD)/lox
 
 
 .PHONY clean:
