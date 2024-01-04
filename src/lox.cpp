@@ -22,11 +22,14 @@ void lox::run_file(const std::string& path) {
         exit(66);
     }
     run(std::string(std::istreambuf_iterator<char>(ifs), std::istreambuf_iterator<char>()));
+    if (lox::hadError)
+        exit(65);
 }
 
 void lox::run_prompt() {
     std::string source;
     for (;;) {
+        lox::hadError = false;
         std::cout << ">> ";
         std::getline(std::cin, source);
         lox::run(source);
@@ -35,4 +38,13 @@ void lox::run_prompt() {
 
 void lox::run(const std::string& source) {
     // ..
+}
+
+void lox::error(const std::string& message, const int line) {
+    lox::report(message, line, "");
+}
+
+void lox::report(const std::string& message, const int line, std::string where) {
+    std::cerr << "[line " << line << "] Error" << where << ": " << message << "\n";
+    lox::hadError = true;
 }
