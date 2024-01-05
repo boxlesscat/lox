@@ -20,15 +20,15 @@ class Scanner {
     
     char advance();
     bool match(const char);
-    char peek();
-    char peek_next();
+    char peek() const;
+    char peek_next() const;
 
     void add_token(const TokenType);
     void add_token(const TokenType, const std::any);
 
-    bool is_digit(const char);
-    bool is_alpha_(const char);
-    bool is_alnum_(const char);
+    bool is_digit(const char) const;
+    bool is_alpha_(const char) const;
+    bool is_alnum_(const char) const;
 
     void check_string();
     void check_number();

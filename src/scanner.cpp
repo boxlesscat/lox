@@ -14,13 +14,13 @@ bool lox::Scanner::match(const char expected) {
     return true; 
 }
 
-char lox::Scanner::peek() {
+char lox::Scanner::peek() const {
     if (current == length)
         return 0;
     return source[current];
 }
 
-char lox::Scanner::peek_next() {
+char lox::Scanner::peek_next() const {
     if (current + 1 >= length)
         return 0;
     return source[current + 1];
@@ -34,15 +34,15 @@ void lox::Scanner::add_token(const lox::TokenType type, const std::any literal) 
     tokens.emplace_back(type, source.substr(start, current - start), literal, line);
 }
 
-bool lox::Scanner::is_digit(const char ch) {
+bool lox::Scanner::is_digit(const char ch) const {
     return '0' <= ch and ch <= '9';
 }
 
-bool lox::Scanner::is_alpha_(const char ch) {
+bool lox::Scanner::is_alpha_(const char ch) const {
     return ch == '_' or 'a' <= ch and ch <= 'z' or 'A' <= ch and ch <= 'Z';
 }
 
-bool lox::Scanner::is_alnum_(const char ch) {
+bool lox::Scanner::is_alnum_(const char ch) const {
     return is_digit(ch) or is_alpha_(ch);
 }
 
