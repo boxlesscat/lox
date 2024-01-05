@@ -5,7 +5,7 @@ BUILD 	:= build
 
 
 lox:
-	g++ -o $(BUILD)/lox -I include $(SRC)/token.cpp $(SRC)/lox.cpp
+	g++ -o $(BUILD)/lox -I include $(SRC)/token.cpp $(SRC)/scanner.cpp $(SRC)/lox.cpp
 	cp $(BUILD)/lox lox
 
 

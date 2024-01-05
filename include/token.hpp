@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <any>
+#include <unordered_map>
 
 
 namespace lox {
@@ -30,6 +31,25 @@ const std::string tokentypes[] = {
     "string", "number", "indentifier",
     "and", "or", "if", "else", "for", "while", "nil", "true", "false",
     "print", "return", "super", "this", "var", "class", "fun",
+};
+
+static std::unordered_map<std::string, TokenType> keywords = {
+    {("and"), AND},
+    {"or", OR},
+    {"if", IF},
+    {"else", ELSE},
+    {"for", FOR},
+    {"while", WHILE},
+    {"nil", NIL},
+    {"true", TRUE},
+    {"false", FALSE},
+    {"print", PRINT},
+    {"return",RETURN},
+    {"super", SUPER},
+    {"this", THIS},
+    {"var", VAR},
+    {"class", CLASS},
+    {"fun", FUN},
 };
 
 struct Token {

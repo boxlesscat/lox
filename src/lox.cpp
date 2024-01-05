@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include "lox.hpp"
+#include "scanner.hpp"
 
 
 int main(int argc, char* argv[]) {
@@ -37,14 +38,17 @@ void lox::run_prompt() {
 }
 
 void lox::run(const std::string& source) {
-    // ..
+    lox::Scanner scanner(source);
+    std::vector<lox::Token> tokens = scanner.scan_tokens();
+    for (lox::Token token : tokens)
+        std::cout << token << "\n";
 }
 
-void lox::error(const std::string& message, const int line) {
+void lox::error(const std::string message, const int line) {
+    lox::hadError = true;
     lox::report(message, line, "");
 }
 
-void lox::report(const std::string& message, const int line, std::string where) {
+void lox::report(const std::string message, const int line, std::string where) {
     std::cerr << "[line " << line << "] Error" << where << ": " << message << "\n";
-    lox::hadError = true;
 }
