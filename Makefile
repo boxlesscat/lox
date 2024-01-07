@@ -1,18 +1,26 @@
-SRC 	:= src
-BUILD 	:= build
+SRC_DIR 	:= src
+INC_DIR 	:= include
+BUILD_DIR 	:= build
 
-.PHONY all: setup lox
+SRC 		:= $(wildcard $(SRC_DIR)/*.cpp)
+OBJ			:= $(SRC:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.o)
+DEP			:= $(OBJ:%.o=.d)
+
+CXX			:= g++
+CPPFLAGS	:= -I $(INC_DIR) -MMD -MP
 
 
-lox:
-	g++ -o $(BUILD)/lox -I include $(SRC)/token.cpp $(SRC)/scanner.cpp $(SRC)/lox.cpp
-	cp $(BUILD)/lox lox
+lox::
+	mkdir -p $(BUILD_DIR)
 
+lox:: $(OBJ)
+	$(CXX) $^ -o $@
 
-setup:
-	mkdir -p $(BUILD)
-
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
+	$(CXX) -c $^ -o $@ $(CPPFLAGS)
 
 .PHONY clean:
-	-rm -rf $(BUILD)
+	-rm -rf build
 	-rm -rf lox
+
+-include $(DEP)
