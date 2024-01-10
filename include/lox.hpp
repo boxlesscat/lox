@@ -17,6 +17,8 @@ void run(const std::string&);
 
 void error(const std::string, const int);
 
+void error(const Token, std::string&&);
+
 void report(const int, const std::string, const std::string);
 
 };
