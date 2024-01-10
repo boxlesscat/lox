@@ -17,7 +17,7 @@ void run(const std::string&);
 
 void error(const std::string, const int);
 
-void report(const std::string, const int, const std::string);
+void report(const int, const std::string, const std::string);
 
 };
 

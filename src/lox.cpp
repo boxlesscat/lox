@@ -23,32 +23,32 @@ void lox::run_file(const std::string& path) {
         exit(66);
     }
     run(std::string(std::istreambuf_iterator<char>(ifs), std::istreambuf_iterator<char>()));
-    if (lox::hadError)
+    if (hadError)
         exit(65);
 }
 
 void lox::run_prompt() {
     std::string source;
     for (;;) {
-        lox::hadError = false;
+        hadError = false;
         std::cout << ">> ";
         std::getline(std::cin, source);
-        lox::run(source);
+        run(source);
     }
 }
 
 void lox::run(const std::string& source) {
-    lox::Scanner scanner(source);
-    std::vector<lox::Token> tokens = scanner.scan_tokens();
-    for (lox::Token token : tokens)
+    Scanner scanner(source);
+    std::vector<Token> tokens = scanner.scan_tokens();
+    for (Token token : tokens)
         std::cout << token << "\n";
 }
 
 void lox::error(const std::string message, const int line) {
-    lox::hadError = true;
-    lox::report(message, line, "");
+    hadError = true;
+    report(line, "", message);
 }
 
-void lox::report(const std::string message, const int line, std::string where) {
+void lox::report(const int line, std::string where, const std::string message) {
     std::cerr << "[line " << line << "] Error" << where << ": " << message << "\n";
 }
