@@ -2,6 +2,8 @@
 #include <fstream>
 #include "lox.hpp"
 #include "scanner.hpp"
+#include "parser.hpp"
+#include "ast_printer.hpp"
 
 
 int main(int argc, char* argv[]) {
@@ -40,13 +42,20 @@ void lox::run_prompt() {
 void lox::run(const std::string& source) {
     Scanner scanner(source);
     std::vector<Token> tokens = scanner.scan_tokens();
-    for (Token token : tokens)
-        std::cout << token << "\n";
+    Parser parser(tokens);
+    std::cout << ASTPrinter().print(parser.parse()) << "\n";
 }
 
 void lox::error(const std::string message, const int line) {
     hadError = true;
     report(line, "", message);
+}
+
+void lox::error(const lox::Token token, std::string&& message) {
+    if (token.type == END)
+        report(token.line, " at end", std::move(message));
+    else
+        report(token.line, " at '" + token.lexeme + "'", message);
 }
 
 void lox::report(const int line, std::string where, const std::string message) {
