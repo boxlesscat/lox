@@ -1,5 +1,6 @@
 #include "parser.hpp"
 #include "lox.hpp"
+#include "error.hpp"
 
 
 std::shared_ptr<lox::Expr> lox::Parser::expression() {

@@ -1,6 +1,7 @@
 #include "scanner.hpp"
 #include "token.hpp"
 #include "lox.hpp"
+#include "error.hpp"
 
 
 char lox::Scanner::advance() {
