@@ -26,14 +26,14 @@ struct Expr {
 struct BinaryExpr : Expr, public std::enable_shared_from_this<BinaryExpr> {
     
     const std::shared_ptr<Expr> left;
-    const Token token;
+    const Token op; // operator
     const std::shared_ptr<Expr> right;
     
     BinaryExpr(const std::shared_ptr<Expr> left, Token token, const std::shared_ptr<Expr> right) :
-        left(std::move(left)), token(std::move(token)), right(std::move(right)) {}
+        left(std::move(left)), op(std::move(token)), right(std::move(right)) {}
     
     std::any accept(Visitor& visitor) override {
-        visitor.visitBinaryExpr(shared_from_this());
+        return visitor.visitBinaryExpr(shared_from_this());
     }
 
 };
@@ -46,34 +46,34 @@ struct GroupingExpr : Expr, public std::enable_shared_from_this<GroupingExpr> {
         expr(std::move(expr)) {}
     
     std::any accept(Visitor& visitor) override {
-        visitor.visitGroupingExpr(shared_from_this());
+        return visitor.visitGroupingExpr(shared_from_this());
     }
 
 };
 
 struct LiteralExpr : Expr, public std::enable_shared_from_this<LiteralExpr> {
     
-    const std::shared_ptr<std::any> value;
+    const std::any value;
     
-    LiteralExpr(const std::shared_ptr<std::any> value) :
+    LiteralExpr(const std::any value) :
         value(std::move(value)) {}
     
     std::any accept(Visitor& visitor) override {
-        visitor.visitLiteralExpr(shared_from_this());
+        return visitor.visitLiteralExpr(shared_from_this());
     }
 
 };
 
 struct UnaryExpr : Expr, public std::enable_shared_from_this<UnaryExpr> {
     
-    const Token token;
+    const Token op; // operator
     const std::shared_ptr<Expr> right;
     
     UnaryExpr(Token token, const std::shared_ptr<Expr> right) :
-        token(std::move(token)), right(std::move(right)) {}
+        op(std::move(token)), right(std::move(right)) {}
     
     std::any accept(Visitor& visitor) override {
-        visitor.visitUnaryExpr(shared_from_this());
+        return visitor.visitUnaryExpr(shared_from_this());
     }
 
 };
