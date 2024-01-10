@@ -155,5 +155,6 @@ std::vector<lox::Token> lox::Scanner::scan_tokens() {
         start = current;
         scan_token();
     }
+    tokens.emplace_back(END, "", nullptr, line);
     return tokens;
 }

@@ -21,6 +21,8 @@ enum TokenType {
     // keywords
     AND, OR, IF, ELSE, FOR, WHILE, NIL, TRUE, FALSE,
     PRINT, RETURN, SUPER, THIS, VAR, CLASS, FUN,
+    // other
+    END,
 };
 
 const std::string tokentypes[] = {

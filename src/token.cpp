@@ -3,6 +3,8 @@
 
 std::string lox::Token::to_string() const {
     switch (type) {
+        case END:
+            return "end of file " + std::to_string(line);
         case NUMBER:
             return lox::tokentypes[type] + " " + lexeme + " (" + std::to_string(std::any_cast<double>(literal)) + ")" + " " + std::to_string(line);
         case STRING:
