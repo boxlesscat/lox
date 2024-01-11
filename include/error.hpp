@@ -7,8 +7,8 @@
 
 namespace lox {
 
-static bool hadError = false;
-static bool hadRuntimeError = false;
+extern bool hadError;
+extern bool hadRuntimeError;
 
 void error(const std::string, const int);
 

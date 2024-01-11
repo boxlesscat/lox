@@ -70,7 +70,7 @@ std::shared_ptr<lox::Expr> lox::Parser::primary() {
         consume(RIGHT_PAREN, "Expected ')' after expression ");
         return std::make_shared<GroupingExpr>(GroupingExpr(expr));
     }
-    throw error(peek(), "Expected expression");
+    throw error(peek(), "Expected an expression");
 }
 
 template<class token_type>
