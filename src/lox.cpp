@@ -45,8 +45,13 @@ void lox::run_prompt() {
 void lox::run(const std::string& source) {
     Scanner scanner(source);
     std::vector<Token> tokens = scanner.scan_tokens();
+    if (hadError)
+        return;
     Parser parser(tokens);
-    std::cout << ASTPrinter().print(parser.parse()) << "\n";
+    const std::shared_ptr<Expr> expr = parser.parse();
+    if (hadError)
+        return;
+    std::cout << ASTPrinter().print(expr) << "\n";
 }
 
 void lox::report(const int line, std::string where, const std::string message) {
