@@ -4,7 +4,7 @@
 #include "scanner.hpp"
 #include "error.hpp"
 #include "parser.hpp"
-#include "ast_printer.hpp"
+#include "interpreter.hpp"
 
 
 int main(int argc, char* argv[]) {
@@ -51,7 +51,7 @@ void lox::run(const std::string& source) {
     const std::shared_ptr<Expr> expr = parser.parse();
     if (hadError)
         return;
-    std::cout << ASTPrinter().print(expr) << "\n";
+    Interpreter().interpret(expr);
 }
 
 void lox::report(const int line, std::string where, const std::string message) {
