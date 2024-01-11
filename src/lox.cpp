@@ -28,6 +28,8 @@ void lox::run_file(const std::string& path) {
     run(std::string(std::istreambuf_iterator<char>(ifs), std::istreambuf_iterator<char>()));
     if (hadError)
         exit(65);
+    if (hadRuntimeError)
+        exit(70);
 }
 
 void lox::run_prompt() {
