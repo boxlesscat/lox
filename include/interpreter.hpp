@@ -6,7 +6,7 @@
 
 namespace lox {
 
-class Interpreter : Visitor {
+class Interpreter : ExprVisitor {
 
     bool is_truthy(const std::any) const;
     bool is_equal(const std::any, const std::any) const;

@@ -7,7 +7,7 @@
 
 namespace lox {
 
-class ASTPrinter : public Visitor {
+class ASTPrinter : public ExprVisitor {
     template <class T> std::string parenthesize(const std::string name, std::initializer_list<T> exprs) {
         std::ostringstream oss;
         oss << "(" << name;
