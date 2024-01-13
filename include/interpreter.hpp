@@ -21,13 +21,13 @@ class Interpreter : ExprVisitor, StmtVisitor {
     std::any evaluate(const std::shared_ptr<Expr>);
 
 public:
-    std::any visitBinaryExpr(const std::shared_ptr<BinaryExpr>) override;
-    std::any visitGroupingExpr(const std::shared_ptr<GroupingExpr>) override;
-    std::any visitLiteralExpr(const std::shared_ptr<LiteralExpr>) override;
-    std::any visitUnaryExpr(const std::shared_ptr<UnaryExpr>) override;
+    std::any visit_binary_expr(const std::shared_ptr<BinaryExpr>) override;
+    std::any visit_grouping_expr(const std::shared_ptr<GroupingExpr>) override;
+    std::any visit_literal_expr(const std::shared_ptr<LiteralExpr>) override;
+    std::any visit_unary_expr(const std::shared_ptr<UnaryExpr>) override;
     
-    std::any visitPrintStmt(const std::shared_ptr<PrintStmt>) override;
-    std::any visitExprStmt(const std::shared_ptr<ExprStmt>) override;
+    std::any visit_print_stmt(const std::shared_ptr<PrintStmt>) override;
+    std::any visit_expr_stmt(const std::shared_ptr<ExprStmt>) override;
 
     void interpret(const std::vector<std::shared_ptr<Stmt>>&);
     std::string stringfy(const std::any) const;

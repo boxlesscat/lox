@@ -48,7 +48,7 @@ std::any lox::Interpreter::evaluate(const std::shared_ptr<lox::Expr> expr) {
     return expr -> accept(*this);
 }
 
-std::any lox::Interpreter::visitBinaryExpr(const std::shared_ptr<lox::BinaryExpr> expr) {
+std::any lox::Interpreter::visit_binary_expr(const std::shared_ptr<lox::BinaryExpr> expr) {
     const std::any left = evaluate(expr -> left);
     const std::any right = evaluate(expr -> right);
     switch (expr -> op.type) {
@@ -93,15 +93,15 @@ std::any lox::Interpreter::visitBinaryExpr(const std::shared_ptr<lox::BinaryExpr
     return nullptr;
 }
 
-std::any lox::Interpreter::visitGroupingExpr(const std::shared_ptr<lox::GroupingExpr> expr) {
+std::any lox::Interpreter::visit_grouping_expr(const std::shared_ptr<lox::GroupingExpr> expr) {
     return evaluate(expr -> expr);
 }
 
-std::any lox::Interpreter::visitLiteralExpr(const std::shared_ptr<lox::LiteralExpr> expr) {
+std::any lox::Interpreter::visit_literal_expr(const std::shared_ptr<lox::LiteralExpr> expr) {
     return expr -> value;
 }
 
-std::any lox::Interpreter::visitUnaryExpr(const std::shared_ptr<lox::UnaryExpr> expr) {
+std::any lox::Interpreter::visit_unary_expr(const std::shared_ptr<lox::UnaryExpr> expr) {
     std::any right = evaluate(expr -> right);
     switch (expr -> op.type) {
         case BANG:
@@ -113,13 +113,13 @@ std::any lox::Interpreter::visitUnaryExpr(const std::shared_ptr<lox::UnaryExpr> 
     return nullptr;
 }
 
-std::any lox::Interpreter::visitPrintStmt(const std::shared_ptr<lox::PrintStmt> statement) {
+std::any lox::Interpreter::visit_print_stmt(const std::shared_ptr<lox::PrintStmt> statement) {
     std::any value = evaluate(statement -> expr);
     std::cout << stringfy(value) << "\n";
     return nullptr;
 }
 
-std::any lox::Interpreter::visitExprStmt(const std::shared_ptr<lox::ExprStmt> statement) {
+std::any lox::Interpreter::visit_expr_stmt(const std::shared_ptr<lox::ExprStmt> statement) {
     evaluate(statement -> expr);
     return nullptr;
 }

@@ -23,8 +23,8 @@ class Parser {
     std::shared_ptr<Expr> primary();
 
     std::shared_ptr<Stmt> statement();
-    std::shared_ptr<Stmt> printStatement();
-    std::shared_ptr<Stmt> expressionStatement();
+    std::shared_ptr<Stmt> print_statement();
+    std::shared_ptr<Stmt> expression_statement();
 
     template<class token_type>
     bool match(std::initializer_list<token_type>);

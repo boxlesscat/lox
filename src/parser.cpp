@@ -75,17 +75,17 @@ std::shared_ptr<lox::Expr> lox::Parser::primary() {
 
 std::shared_ptr<lox::Stmt> lox::Parser::statement() {
     if (match({PRINT}))
-        return printStatement();
-    return expressionStatement();
+        return print_statement();
+    return expression_statement();
 }
 
-std::shared_ptr<lox::Stmt> lox::Parser::printStatement() {
+std::shared_ptr<lox::Stmt> lox::Parser::print_statement() {
     std::shared_ptr<Expr> value = expression();
     consume(SEMICOLON, "Expected ';' after value");
     return std::make_shared<PrintStmt>(PrintStmt(value));
 }
 
-std::shared_ptr<lox::Stmt> lox::Parser::expressionStatement() {
+std::shared_ptr<lox::Stmt> lox::Parser::expression_statement() {
     std::shared_ptr<Expr> value = expression();
     consume(SEMICOLON, "Expected ';' after value");
     return std::make_shared<ExprStmt>(ExprStmt(value));

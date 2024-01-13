@@ -18,10 +18,10 @@ class ASTPrinter : public ExprVisitor {
     }
 public:
     std::string print(const std::shared_ptr<Expr> expr);
-    std::any visitBinaryExpr(const std::shared_ptr<BinaryExpr> expr) override;
-    std::any visitGroupingExpr(const std::shared_ptr<GroupingExpr> expr) override;
-    std::any visitLiteralExpr(const std::shared_ptr<LiteralExpr> expr) override;
-    std::any visitUnaryExpr(const std::shared_ptr<UnaryExpr> expr) override;
+    std::any visit_binary_expr(const std::shared_ptr<BinaryExpr> expr) override;
+    std::any visit_grouping_expr(const std::shared_ptr<GroupingExpr> expr) override;
+    std::any visit_literal_expr(const std::shared_ptr<LiteralExpr> expr) override;
+    std::any visit_unary_expr(const std::shared_ptr<UnaryExpr> expr) override;
 };
 
 };

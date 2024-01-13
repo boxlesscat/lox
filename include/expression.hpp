@@ -13,10 +13,10 @@ struct LiteralExpr;
 struct UnaryExpr;
 
 struct ExprVisitor {
-    virtual std::any visitBinaryExpr(const std::shared_ptr<BinaryExpr>) = 0;
-    virtual std::any visitGroupingExpr(const std::shared_ptr<GroupingExpr>) = 0;
-    virtual std::any visitLiteralExpr(const std::shared_ptr<LiteralExpr>) = 0;
-    virtual std::any visitUnaryExpr(const std::shared_ptr<UnaryExpr>) = 0;
+    virtual std::any visit_binary_expr(const std::shared_ptr<BinaryExpr>) = 0;
+    virtual std::any visit_grouping_expr(const std::shared_ptr<GroupingExpr>) = 0;
+    virtual std::any visit_literal_expr(const std::shared_ptr<LiteralExpr>) = 0;
+    virtual std::any visit_unary_expr(const std::shared_ptr<UnaryExpr>) = 0;
 };
 
 struct Expr {
@@ -33,7 +33,7 @@ struct BinaryExpr : Expr, public std::enable_shared_from_this<BinaryExpr> {
         left(std::move(left)), op(std::move(token)), right(std::move(right)) {}
     
     std::any accept(ExprVisitor& visitor) override {
-        return visitor.visitBinaryExpr(shared_from_this());
+        return visitor.visit_binary_expr(shared_from_this());
     }
 
 };
@@ -46,7 +46,7 @@ struct GroupingExpr : Expr, public std::enable_shared_from_this<GroupingExpr> {
         expr(std::move(expr)) {}
     
     std::any accept(ExprVisitor& visitor) override {
-        return visitor.visitGroupingExpr(shared_from_this());
+        return visitor.visit_grouping_expr(shared_from_this());
     }
 
 };
@@ -59,7 +59,7 @@ struct LiteralExpr : Expr, public std::enable_shared_from_this<LiteralExpr> {
         value(std::move(value)) {}
     
     std::any accept(ExprVisitor& visitor) override {
-        return visitor.visitLiteralExpr(shared_from_this());
+        return visitor.visit_literal_expr(shared_from_this());
     }
 
 };
@@ -73,7 +73,7 @@ struct UnaryExpr : Expr, public std::enable_shared_from_this<UnaryExpr> {
         op(std::move(token)), right(std::move(right)) {}
     
     std::any accept(ExprVisitor& visitor) override {
-        return visitor.visitUnaryExpr(shared_from_this());
+        return visitor.visit_unary_expr(shared_from_this());
     }
 
 };
