@@ -4,6 +4,7 @@
 #include <vector>
 #include "token.hpp"
 #include "expression.hpp"
+#include "stmt.hpp"
 
 
 namespace lox {
@@ -20,6 +21,10 @@ class Parser {
     std::shared_ptr<Expr> factor();
     std::shared_ptr<Expr> unary();
     std::shared_ptr<Expr> primary();
+
+    std::shared_ptr<Stmt> statement();
+    std::shared_ptr<Stmt> printStatement();
+    std::shared_ptr<Stmt> expressionStatement();
 
     template<class token_type>
     bool match(std::initializer_list<token_type>);
@@ -41,7 +46,7 @@ class Parser {
 
 public:
     Parser(std::vector<Token>& tokens) : tokens(tokens) {}
-    std::shared_ptr<Expr> parse();
+    std::shared_ptr<std::vector<std::shared_ptr<Stmt>>> parse();
 };
 
 };

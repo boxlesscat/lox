@@ -73,6 +73,24 @@ std::shared_ptr<lox::Expr> lox::Parser::primary() {
     throw error(peek(), "Expected an expression");
 }
 
+std::shared_ptr<lox::Stmt> lox::Parser::statement() {
+    if (match({PRINT}))
+        return printStatement();
+    return expressionStatement();
+}
+
+std::shared_ptr<lox::Stmt> lox::Parser::printStatement() {
+    std::shared_ptr<Expr> value = expression();
+    consume(SEMICOLON, "Expected ';' after value");
+    return std::make_shared<PrintStmt>(PrintStmt(value));
+}
+
+std::shared_ptr<lox::Stmt> lox::Parser::expressionStatement() {
+    std::shared_ptr<Expr> value = expression();
+    consume(SEMICOLON, "Expected ';' after value");
+    return std::make_shared<ExprStmt>(ExprStmt(value));
+}
+
 template<class token_type>
 bool lox::Parser::match(std::initializer_list<token_type> types) {
     for (TokenType type : types)
@@ -136,10 +154,14 @@ void lox::Parser::synchronize() {
     }
 }
 
-std::shared_ptr<lox::Expr> lox::Parser::parse() {
-    try {
-        return expression();
-    } catch (ParseError error) {
-        return nullptr;
-    }
+std::shared_ptr<std::vector<std::shared_ptr<lox::Stmt>>> lox::Parser::parse() {
+    using vec = std::vector<std::shared_ptr<Stmt>>;
+    std::shared_ptr<vec> statements = std::make_shared<vec>(vec());
+    while (!end())
+        try {
+            statements -> emplace_back(statement());
+        } catch(ParseError) {
+            return statements;
+        }
+    return statements;
 }

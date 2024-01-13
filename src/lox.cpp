@@ -48,10 +48,10 @@ void lox::run(const std::string& source) {
     if (hadError)
         return;
     Parser parser(tokens);
-    const std::shared_ptr<Expr> expr = parser.parse();
+    std::shared_ptr<std::vector<std::shared_ptr<Stmt>>> statements = parser.parse();
     if (hadError)
         return;
-    Interpreter().interpret(expr);
+    Interpreter().interpret(*statements);
 }
 
 void lox::report(const int line, std::string where, const std::string message) {

@@ -40,6 +40,10 @@ void lox::Interpreter::check_number_operands(const lox::Token op, const std::any
     throw RuntimeError(op, "Operands must be numbers");
 }
 
+void lox::Interpreter::execute(const std::shared_ptr<lox::Stmt> statement) {
+    statement -> accept(*this);
+}
+
 std::any lox::Interpreter::evaluate(const std::shared_ptr<lox::Expr> expr) {
     return expr -> accept(*this);
 }
@@ -109,10 +113,21 @@ std::any lox::Interpreter::visitUnaryExpr(const std::shared_ptr<lox::UnaryExpr> 
     return nullptr;
 }
 
-void lox::Interpreter::interpret(const std::shared_ptr<lox::Expr> expr) {
+std::any lox::Interpreter::visitPrintStmt(const std::shared_ptr<lox::PrintStmt> statement) {
+    std::any value = evaluate(statement -> expr);
+    std::cout << stringfy(value) << "\n";
+    return nullptr;
+}
+
+std::any lox::Interpreter::visitExprStmt(const std::shared_ptr<lox::ExprStmt> statement) {
+    evaluate(statement -> expr);
+    return nullptr;
+}
+
+void lox::Interpreter::interpret(const std::vector<std::shared_ptr<lox::Stmt>>& statements) {
     try {
-        const std::any value = evaluate(expr);
-        std::cout << stringfy(value) << "\n";
+        for (auto statement : statements)
+            execute(statement);
     } catch (RuntimeError error) {
         runtime_error(error);
     }
