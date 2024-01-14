@@ -15,6 +15,7 @@ class Parser {
     int current = 0;
 
     std::shared_ptr<Expr> expression();
+    std::shared_ptr<Expr> assignment();
     std::shared_ptr<Expr> equality();
     std::shared_ptr<Expr> comparision();
     std::shared_ptr<Expr> term();
@@ -22,9 +23,13 @@ class Parser {
     std::shared_ptr<Expr> unary();
     std::shared_ptr<Expr> primary();
 
+    std::shared_ptr<Stmt> declaration();
+    std::shared_ptr<Stmt> var_declaration();
     std::shared_ptr<Stmt> statement();
     std::shared_ptr<Stmt> print_statement();
     std::shared_ptr<Stmt> expression_statement();
+
+    std::shared_ptr<std::vector<std::shared_ptr<Stmt>>> block();
 
     template<class token_type>
     bool match(std::initializer_list<token_type>);

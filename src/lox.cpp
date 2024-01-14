@@ -7,6 +7,8 @@
 #include "interpreter.hpp"
 
 
+lox::Interpreter interpreter;
+
 int main(int argc, char* argv[]) {
     if (argc > 2) {
         std::cerr << "usage lox [script]";
@@ -51,7 +53,7 @@ void lox::run(const std::string& source) {
     std::shared_ptr<std::vector<std::shared_ptr<Stmt>>> statements = parser.parse();
     if (hadError)
         return;
-    Interpreter().interpret(*statements);
+    interpreter.interpret(*statements);
 }
 
 void lox::report(const int line, std::string where, const std::string message) {

@@ -4,7 +4,20 @@
 
 
 std::shared_ptr<lox::Expr> lox::Parser::expression() {
-    return equality();
+    return assignment();
+}
+
+std::shared_ptr<lox::Expr> lox::Parser::assignment() {
+    std::shared_ptr<Expr> expr = equality();
+    if (match({EQUAL})) {
+        Token equal = previous();
+        std::shared_ptr<lox::Expr> value = assignment();
+        if (typeid(*expr) == typeid(VariableExpr)) {
+            Token name = std::dynamic_pointer_cast<VariableExpr>(expr) -> name;
+            return std::make_shared<AssignExpr>(AssignExpr(name, value));
+        }
+    }
+    return expr;
 }
 
 std::shared_ptr<lox::Expr> lox::Parser::equality() {
@@ -65,6 +78,8 @@ std::shared_ptr<lox::Expr> lox::Parser::primary() {
         return std::make_shared<LiteralExpr>(LiteralExpr(nullptr));
     if (match({NUMBER, STRING}))
         return std::make_shared<LiteralExpr>(LiteralExpr(previous().literal));
+    if (match({IDENTIFIER}))
+        return std::make_shared<VariableExpr>(VariableExpr(previous()));
     if (match({LEFT_PAREN})) {
         std::shared_ptr<lox::Expr> expr = expression();
         consume(RIGHT_PAREN, "Expected ')' after expression ");
@@ -73,10 +88,39 @@ std::shared_ptr<lox::Expr> lox::Parser::primary() {
     throw error(peek(), "Expected an expression");
 }
 
+std::shared_ptr<lox::Stmt> lox::Parser::declaration() {
+    try {
+        if (match({VAR}))
+            return var_declaration();
+        return statement();
+    } catch(ParseError) {
+        synchronize();
+        return nullptr;
+    }
+}
+
+std::shared_ptr<lox::Stmt> lox::Parser::var_declaration() {
+    Token name = consume(IDENTIFIER, "Expected variable name");
+    std::shared_ptr<Expr> initializer = match({EQUAL}) ? expression() : nullptr;
+    consume(SEMICOLON, "Expected ';' after variable declaration");
+    return std::make_shared<VarStmt>(VarStmt(name, initializer));
+}
+
 std::shared_ptr<lox::Stmt> lox::Parser::statement() {
     if (match({PRINT}))
         return print_statement();
+    if (match({LEFT_CURLY}))
+        return std::make_shared<BlockStmt>(BlockStmt(block()));
     return expression_statement();
+}
+
+std::shared_ptr<std::vector<std::shared_ptr<lox::Stmt>>> lox::Parser::block() {
+    using vec = std::vector<std::shared_ptr<Stmt>>;
+    std::shared_ptr<vec> statements = std::make_shared<vec>(vec());
+    while (!check(RIGHT_CURLY) and !end())
+        statements -> emplace_back(declaration());
+    consume(RIGHT_CURLY, "Expected '{' after block");
+    return statements;
 }
 
 std::shared_ptr<lox::Stmt> lox::Parser::print_statement() {
@@ -159,7 +203,7 @@ std::shared_ptr<std::vector<std::shared_ptr<lox::Stmt>>> lox::Parser::parse() {
     std::shared_ptr<vec> statements = std::make_shared<vec>(vec());
     while (!end())
         try {
-            statements -> emplace_back(statement());
+            statements -> emplace_back(declaration());
         } catch(ParseError) {
             return statements;
         }

@@ -44,8 +44,24 @@ void lox::Interpreter::execute(const std::shared_ptr<lox::Stmt> statement) {
     statement -> accept(*this);
 }
 
+void lox::Interpreter::execute_block(const std::shared_ptr<std::vector<std::shared_ptr<lox::Stmt>>> statements, std::shared_ptr<lox::Environment> environment) {
+    std::shared_ptr<Environment> previous = this -> environment;
+    try {
+        this -> environment = environment;
+        for (auto statement : *statements)
+            execute(statement);
+    } catch(RuntimeError) {}
+    this -> environment = previous;
+}
+
 std::any lox::Interpreter::evaluate(const std::shared_ptr<lox::Expr> expr) {
     return expr -> accept(*this);
+}
+
+std::any lox::Interpreter::visit_assign_expr(const std::shared_ptr<lox::AssignExpr> expr) {
+    std::any value = evaluate(expr -> value);
+    environment -> assign(expr -> name, value);
+    return value;
 }
 
 std::any lox::Interpreter::visit_binary_expr(const std::shared_ptr<lox::BinaryExpr> expr) {
@@ -113,6 +129,15 @@ std::any lox::Interpreter::visit_unary_expr(const std::shared_ptr<lox::UnaryExpr
     return nullptr;
 }
 
+std::any lox::Interpreter::visit_variable_expr(const std::shared_ptr<lox::VariableExpr> expr) {
+    return environment -> get(expr -> name);
+}
+
+std::any lox::Interpreter::visit_block_stmt(const std::shared_ptr<lox::BlockStmt> statement) {
+    execute_block(statement -> statements, std::make_shared<Environment>(Environment(environment)));
+    return nullptr;
+}
+
 std::any lox::Interpreter::visit_print_stmt(const std::shared_ptr<lox::PrintStmt> statement) {
     std::any value = evaluate(statement -> expr);
     std::cout << stringfy(value) << "\n";
@@ -121,6 +146,14 @@ std::any lox::Interpreter::visit_print_stmt(const std::shared_ptr<lox::PrintStmt
 
 std::any lox::Interpreter::visit_expr_stmt(const std::shared_ptr<lox::ExprStmt> statement) {
     evaluate(statement -> expr);
+    return nullptr;
+}
+
+std::any lox::Interpreter::visit_var_stmt(const std::shared_ptr<lox::VarStmt> statement) {
+    std::any value = nullptr;
+    if (statement -> initializer != nullptr)
+        value = evaluate(statement -> initializer);
+    environment -> define(statement -> name, value);
     return nullptr;
 }
 
