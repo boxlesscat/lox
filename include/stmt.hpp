@@ -11,6 +11,7 @@ struct IfStmt;
 struct VarStmt;
 struct PrintStmt;
 struct ExprStmt;
+struct WhileStmt;
 
 struct StmtVisitor {
     virtual void visit_block_stmt(const std::shared_ptr<BlockStmt>) = 0;
@@ -18,6 +19,7 @@ struct StmtVisitor {
     virtual void visit_var_stmt(const std::shared_ptr<VarStmt>) = 0;
     virtual void visit_print_stmt(const std::shared_ptr<PrintStmt>) = 0;
     virtual void visit_expr_stmt(const std::shared_ptr<ExprStmt>) = 0;
+    virtual void visit_while_stmt(const std::shared_ptr<WhileStmt>) = 0;
 };
 
 struct Stmt {
@@ -31,7 +33,7 @@ struct BlockStmt : Stmt, public std::enable_shared_from_this<BlockStmt> {
     BlockStmt(const std::shared_ptr<std::vector<std::shared_ptr<Stmt>>> statements) : statements(statements) {}
 
     void accept(StmtVisitor& visitor) override {
-        return visitor.visit_block_stmt(shared_from_this());
+        visitor.visit_block_stmt(shared_from_this());
     }
 
 };
@@ -46,7 +48,7 @@ struct IfStmt : Stmt, public std::enable_shared_from_this<IfStmt> {
         condition(condition), then(then), otherwise(otherwise) {}
 
     void accept(StmtVisitor& visitor) override {
-        return visitor.visit_if_stmt(shared_from_this());
+        visitor.visit_if_stmt(shared_from_this());
     }
 
 };
@@ -59,7 +61,7 @@ struct VarStmt : Stmt, public std::enable_shared_from_this<VarStmt> {
     VarStmt(const Token name, const std::shared_ptr<Expr> initializer) : name(name), initializer(initializer) {}
 
     void accept(StmtVisitor& visitor) override {
-        return visitor.visit_var_stmt(shared_from_this());
+        visitor.visit_var_stmt(shared_from_this());
     }
 
 };
@@ -71,7 +73,7 @@ struct PrintStmt : Stmt, public std::enable_shared_from_this<PrintStmt> {
     PrintStmt(const std::shared_ptr<Expr> expr) : expr(expr) {}
 
     void accept(StmtVisitor& visitor) override {
-        return visitor.visit_print_stmt(shared_from_this());
+        visitor.visit_print_stmt(shared_from_this());
     }
 
 };
@@ -83,7 +85,21 @@ struct ExprStmt : Stmt, public std::enable_shared_from_this<ExprStmt> {
     ExprStmt(const std::shared_ptr<Expr> expr) : expr(expr) {}
 
     void accept(StmtVisitor& visitor) override {
-        return visitor.visit_expr_stmt(shared_from_this());
+        visitor.visit_expr_stmt(shared_from_this());
+    }
+
+};
+
+struct WhileStmt : Stmt, public std::enable_shared_from_this<WhileStmt> {
+
+    const std::shared_ptr<Expr> condition;
+    const std::shared_ptr<Stmt> body;
+
+    WhileStmt(const std::shared_ptr<Expr> condition, const std::shared_ptr<Stmt> body) :
+        condition(condition), body(body) {}
+    
+    void accept(StmtVisitor& visitor) override {
+        visitor.visit_while_stmt(shared_from_this());
     }
 
 };
