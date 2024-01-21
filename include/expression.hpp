@@ -11,6 +11,7 @@ struct AssignExpr;
 struct BinaryExpr;
 struct GroupingExpr;
 struct LiteralExpr;
+struct LogicalExpr;
 struct UnaryExpr;
 struct VariableExpr;
 
@@ -19,6 +20,7 @@ struct ExprVisitor {
     virtual std::any visit_binary_expr(const std::shared_ptr<BinaryExpr>) = 0;
     virtual std::any visit_grouping_expr(const std::shared_ptr<GroupingExpr>) = 0;
     virtual std::any visit_literal_expr(const std::shared_ptr<LiteralExpr>) = 0;
+    virtual std::any visit_logical_expr(const std::shared_ptr<LogicalExpr>) = 0;
     virtual std::any visit_unary_expr(const std::shared_ptr<UnaryExpr>) = 0;
     virtual std::any visit_variable_expr(const std::shared_ptr<VariableExpr>) = 0;
 };
@@ -77,6 +79,21 @@ struct LiteralExpr : Expr, public std::enable_shared_from_this<LiteralExpr> {
     
     std::any accept(ExprVisitor& visitor) override {
         return visitor.visit_literal_expr(shared_from_this());
+    }
+
+};
+
+struct LogicalExpr : Expr, public std::enable_shared_from_this<LogicalExpr> {
+
+    const std::shared_ptr<Expr> left;
+    const Token op; // operator
+    const std::shared_ptr<Expr> right;
+
+    LogicalExpr(const std::shared_ptr<Expr> left, Token op, const std::shared_ptr<Expr> right) :
+        left(left), op(op), right(right) {}
+
+    std::any accept(ExprVisitor& visitor) override {
+        return visitor.visit_logical_expr(shared_from_this());
     }
 
 };

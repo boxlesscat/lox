@@ -8,7 +8,7 @@ std::shared_ptr<lox::Expr> lox::Parser::expression() {
 }
 
 std::shared_ptr<lox::Expr> lox::Parser::assignment() {
-    std::shared_ptr<Expr> expr = equality();
+    std::shared_ptr<Expr> expr = logical_or();
     if (match({EQUAL})) {
         Token equal = previous();
         std::shared_ptr<lox::Expr> value = assignment();
@@ -16,6 +16,27 @@ std::shared_ptr<lox::Expr> lox::Parser::assignment() {
             Token name = std::dynamic_pointer_cast<VariableExpr>(expr) -> name;
             return std::make_shared<AssignExpr>(name, value);
         }
+        throw error(equal, "Invalid Assignment Target");
+    }
+    return expr;
+}
+
+std::shared_ptr<lox::Expr> lox::Parser::logical_or() {
+    std::shared_ptr<Expr> expr = logical_and();
+    if (match({OR})) {
+        Token op = previous();
+        std::shared_ptr<Expr> right = logical_and();
+        expr = std::make_shared<LogicalExpr>(expr, op, right);
+    }
+    return expr;
+}
+
+std::shared_ptr<lox::Expr> lox::Parser::logical_and() {
+    std::shared_ptr<Expr> expr = equality();
+    if (match({AND})) {
+        Token op = previous();
+        std::shared_ptr<Expr> right = equality();
+        expr = std::make_shared<LogicalExpr>(expr, op, right);
     }
     return expr;
 }

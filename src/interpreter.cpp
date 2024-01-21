@@ -117,6 +117,18 @@ std::any lox::Interpreter::visit_literal_expr(const std::shared_ptr<lox::Literal
     return expr -> value;
 }
 
+std::any lox::Interpreter::visit_logical_expr(const std::shared_ptr<lox::LogicalExpr> expr) {
+    std::any left = evaluate(expr -> left);
+    if (expr -> op.type == OR) {
+        if (is_truthy(left))
+            return left;
+    } else {
+        if (!is_truthy(left))
+            return left;
+    }
+    return evaluate(expr -> right);
+}
+
 std::any lox::Interpreter::visit_unary_expr(const std::shared_ptr<lox::UnaryExpr> expr) {
     std::any right = evaluate(expr -> right);
     switch (expr -> op.type) {
