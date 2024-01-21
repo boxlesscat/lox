@@ -4,7 +4,7 @@ BUILD_DIR 	:= build
 
 SRC 		:= $(wildcard $(SRC_DIR)/*.cpp)
 OBJ			:= $(SRC:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.o)
-DEP			:= $(OBJ:%.o=.d)
+DEP			:= $(SRC:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.d)
 
 CXX			:= g++
 CPPFLAGS	:= -I $(INC_DIR) -MMD -MP
@@ -17,7 +17,7 @@ lox:: $(OBJ)
 	$(CXX) $^ -o $@
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
-	$(CXX) -c $^ -o $@ $(CPPFLAGS)
+	$(CXX) -c $< -o $@ $(CPPFLAGS)
 
 .PHONY clean:
 	-rm -rf build
