@@ -133,28 +133,24 @@ std::any lox::Interpreter::visit_variable_expr(const std::shared_ptr<lox::Variab
     return environment -> get(expr -> name);
 }
 
-std::any lox::Interpreter::visit_block_stmt(const std::shared_ptr<lox::BlockStmt> statement) {
+void lox::Interpreter::visit_block_stmt(const std::shared_ptr<lox::BlockStmt> statement) {
     execute_block(statement -> statements, std::make_shared<Environment>(environment));
-    return nullptr;
 }
 
-std::any lox::Interpreter::visit_print_stmt(const std::shared_ptr<lox::PrintStmt> statement) {
+void lox::Interpreter::visit_print_stmt(const std::shared_ptr<lox::PrintStmt> statement) {
     std::any value = evaluate(statement -> expr);
     std::cout << stringfy(value) << "\n";
-    return nullptr;
 }
 
-std::any lox::Interpreter::visit_expr_stmt(const std::shared_ptr<lox::ExprStmt> statement) {
+void lox::Interpreter::visit_expr_stmt(const std::shared_ptr<lox::ExprStmt> statement) {
     evaluate(statement -> expr);
-    return nullptr;
 }
 
-std::any lox::Interpreter::visit_var_stmt(const std::shared_ptr<lox::VarStmt> statement) {
+void lox::Interpreter::visit_var_stmt(const std::shared_ptr<lox::VarStmt> statement) {
     std::any value = nullptr;
     if (statement -> initializer != nullptr)
         value = evaluate(statement -> initializer);
     environment -> define(statement -> name, value);
-    return nullptr;
 }
 
 void lox::Interpreter::interpret(const std::vector<std::shared_ptr<lox::Stmt>>& statements) {

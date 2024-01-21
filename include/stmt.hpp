@@ -12,14 +12,14 @@ struct PrintStmt;
 struct ExprStmt;
 
 struct StmtVisitor {
-    virtual std::any visit_block_stmt(const std::shared_ptr<BlockStmt>) = 0;
-    virtual std::any visit_var_stmt(const std::shared_ptr<VarStmt>) = 0;
-    virtual std::any visit_print_stmt(const std::shared_ptr<PrintStmt>) = 0;
-    virtual std::any visit_expr_stmt(const std::shared_ptr<ExprStmt>) = 0;
+    virtual void visit_block_stmt(const std::shared_ptr<BlockStmt>) = 0;
+    virtual void visit_var_stmt(const std::shared_ptr<VarStmt>) = 0;
+    virtual void visit_print_stmt(const std::shared_ptr<PrintStmt>) = 0;
+    virtual void visit_expr_stmt(const std::shared_ptr<ExprStmt>) = 0;
 };
 
 struct Stmt {
-    virtual std::any accept(StmtVisitor&) = 0;
+    virtual void accept(StmtVisitor&) = 0;
 };
 
 struct BlockStmt : Stmt, public std::enable_shared_from_this<BlockStmt> {
@@ -28,7 +28,7 @@ struct BlockStmt : Stmt, public std::enable_shared_from_this<BlockStmt> {
 
     BlockStmt(const std::shared_ptr<std::vector<std::shared_ptr<Stmt>>> statements) : statements(statements) {}
 
-    std::any accept(StmtVisitor& visitor) override {
+    void accept(StmtVisitor& visitor) override {
         return visitor.visit_block_stmt(shared_from_this());
     }
 
@@ -41,7 +41,7 @@ struct VarStmt : Stmt, public std::enable_shared_from_this<VarStmt> {
 
     VarStmt(const Token name, const std::shared_ptr<Expr> initializer) : name(name), initializer(initializer) {}
 
-    std::any accept(StmtVisitor& visitor) override {
+    void accept(StmtVisitor& visitor) override {
         return visitor.visit_var_stmt(shared_from_this());
     }
 
@@ -53,7 +53,7 @@ struct PrintStmt : Stmt, public std::enable_shared_from_this<PrintStmt> {
 
     PrintStmt(const std::shared_ptr<Expr> expr) : expr(expr) {}
 
-    std::any accept(StmtVisitor& visitor) override {
+    void accept(StmtVisitor& visitor) override {
         return visitor.visit_print_stmt(shared_from_this());
     }
 
@@ -65,7 +65,7 @@ struct ExprStmt : Stmt, public std::enable_shared_from_this<ExprStmt> {
     
     ExprStmt(const std::shared_ptr<Expr> expr) : expr(expr) {}
 
-    std::any accept(StmtVisitor& visitor) override {
+    void accept(StmtVisitor& visitor) override {
         return visitor.visit_expr_stmt(shared_from_this());
     }
 

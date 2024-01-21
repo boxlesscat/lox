@@ -31,10 +31,10 @@ class Interpreter : ExprVisitor, StmtVisitor {
     std::any visit_unary_expr(const std::shared_ptr<UnaryExpr>) override;
     std::any visit_variable_expr(const std::shared_ptr<VariableExpr>) override;
     
-    std::any visit_block_stmt(const std::shared_ptr<BlockStmt>) override;
-    std::any visit_var_stmt(const std::shared_ptr<VarStmt>) override;
-    std::any visit_print_stmt(const std::shared_ptr<PrintStmt>) override;
-    std::any visit_expr_stmt(const std::shared_ptr<ExprStmt>) override;
+    void visit_block_stmt(const std::shared_ptr<BlockStmt>) override;
+    void visit_var_stmt(const std::shared_ptr<VarStmt>) override;
+    void visit_print_stmt(const std::shared_ptr<PrintStmt>) override;
+    void visit_expr_stmt(const std::shared_ptr<ExprStmt>) override;
 
 public:
     void interpret(const std::vector<std::shared_ptr<Stmt>>&);
