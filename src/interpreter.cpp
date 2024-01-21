@@ -172,6 +172,11 @@ void lox::Interpreter::visit_var_stmt(const std::shared_ptr<lox::VarStmt> statem
     environment -> define(statement -> name, value);
 }
 
+void lox::Interpreter::visit_while_stmt(const std::shared_ptr<lox::WhileStmt> statement) {
+    while (is_truthy(evaluate(statement -> condition)))
+        execute(statement -> body);
+}
+
 void lox::Interpreter::interpret(const std::vector<std::shared_ptr<lox::Stmt>>& statements) {
     try {
         for (auto statement : statements)

@@ -134,6 +134,8 @@ std::shared_ptr<lox::Stmt> lox::Parser::statement() {
         return std::make_shared<BlockStmt>(block());
     if (match({IF}))
         return if_statement();
+    if (match({WHILE}))
+        return while_statement();
     return expression_statement();
 }
 
@@ -167,6 +169,14 @@ std::shared_ptr<lox::Stmt> lox::Parser::expression_statement() {
     std::shared_ptr<Expr> value = expression();
     consume(SEMICOLON, "Expected ';' after value");
     return std::make_shared<ExprStmt>(value);
+}
+
+std::shared_ptr<lox::Stmt> lox::Parser::while_statement() {
+    consume(LEFT_PAREN, "Expected '(' after while");
+    std::shared_ptr<Expr> condition = expression();
+    consume(RIGHT_PAREN, "Expected ')' after condition");
+    std::shared_ptr<Stmt> body = statement();
+    return std::make_shared<WhileStmt>(condition, body);
 }
 
 template<class token_type>

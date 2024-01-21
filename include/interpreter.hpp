@@ -37,6 +37,7 @@ class Interpreter : ExprVisitor, StmtVisitor {
     void visit_var_stmt(const std::shared_ptr<VarStmt>) override;
     void visit_print_stmt(const std::shared_ptr<PrintStmt>) override;
     void visit_expr_stmt(const std::shared_ptr<ExprStmt>) override;
+    void visit_while_stmt(const std::shared_ptr<WhileStmt>) override;
 
 public:
     void interpret(const std::vector<std::shared_ptr<Stmt>>&);
