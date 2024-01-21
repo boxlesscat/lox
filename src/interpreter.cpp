@@ -134,7 +134,7 @@ std::any lox::Interpreter::visit_variable_expr(const std::shared_ptr<lox::Variab
 }
 
 std::any lox::Interpreter::visit_block_stmt(const std::shared_ptr<lox::BlockStmt> statement) {
-    execute_block(statement -> statements, std::make_shared<Environment>(Environment(environment)));
+    execute_block(statement -> statements, std::make_shared<Environment>(environment));
     return nullptr;
 }
 

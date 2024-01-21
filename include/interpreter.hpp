@@ -11,7 +11,7 @@ namespace lox {
 
 class Interpreter : ExprVisitor, StmtVisitor {
 
-    std::shared_ptr<Environment> environment = std::make_shared<Environment>(Environment());
+    std::shared_ptr<Environment> environment = std::make_shared<Environment>();
 
     bool is_truthy(const std::any) const;
     bool is_equal(const std::any, const std::any) const;
