@@ -136,6 +136,8 @@ std::shared_ptr<lox::Stmt> lox::Parser::statement() {
         return if_statement();
     if (match({WHILE}))
         return while_statement();
+    if (match({FOR}))
+        return for_statement();
     return expression_statement();
 }
 
@@ -146,6 +148,43 @@ std::shared_ptr<std::vector<std::shared_ptr<lox::Stmt>>> lox::Parser::block() {
         statements -> emplace_back(declaration());
     consume(RIGHT_CURLY, "Expected '{' after block");
     return statements;
+}
+
+std::shared_ptr<lox::Stmt> lox::Parser::for_statement() {
+    consume(LEFT_PAREN, "Expected '(' after for");
+    std::shared_ptr<Stmt> init = nullptr;
+    if (match({SEMICOLON}))
+        ;
+    else if (match({VAR}))
+        init = var_declaration();
+    else
+        init = expression_statement();
+    std::shared_ptr<Expr> condition = nullptr;
+    if (!check({SEMICOLON}))
+        condition = expression();
+    consume(SEMICOLON, "Expected ';' after condition");
+    std::shared_ptr<Expr> update = nullptr;
+    if (!check({RIGHT_PAREN}))
+        update = expression();
+    consume(RIGHT_PAREN, "Expected ')' after for clauses");
+    std::shared_ptr<Stmt> body = statement();
+    if (update != nullptr) {
+        std::shared_ptr<std::vector<std::shared_ptr<Stmt>>> vec = std::make_shared<std::vector<std::shared_ptr<Stmt>>>();
+        if (typeid(*body) == typeid(BlockStmt))
+            vec = std::dynamic_pointer_cast<BlockStmt>(body) -> statements;
+        else
+            vec -> emplace_back(body);
+        vec -> emplace_back(std::make_shared<ExprStmt>(update));
+        body = std::make_shared<BlockStmt>(vec);
+    }
+    body = std::make_shared<WhileStmt>(condition, body);
+    if (init != nullptr) {
+        std::shared_ptr<std::vector<std::shared_ptr<Stmt>>> vec = std::make_shared<std::vector<std::shared_ptr<Stmt>>>();
+        vec -> emplace_back(init);
+        vec -> emplace_back(body);
+        body = std::make_shared<BlockStmt>(vec);
+    }
+    return body;
 }
 
 std::shared_ptr<lox::Stmt> lox::Parser::if_statement() {
