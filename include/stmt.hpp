@@ -7,12 +7,14 @@
 namespace lox {
 
 struct BlockStmt;
+struct IfStmt;
 struct VarStmt;
 struct PrintStmt;
 struct ExprStmt;
 
 struct StmtVisitor {
     virtual void visit_block_stmt(const std::shared_ptr<BlockStmt>) = 0;
+    virtual void visit_if_stmt(const std::shared_ptr<IfStmt>) = 0;
     virtual void visit_var_stmt(const std::shared_ptr<VarStmt>) = 0;
     virtual void visit_print_stmt(const std::shared_ptr<PrintStmt>) = 0;
     virtual void visit_expr_stmt(const std::shared_ptr<ExprStmt>) = 0;
@@ -30,6 +32,21 @@ struct BlockStmt : Stmt, public std::enable_shared_from_this<BlockStmt> {
 
     void accept(StmtVisitor& visitor) override {
         return visitor.visit_block_stmt(shared_from_this());
+    }
+
+};
+
+struct IfStmt : Stmt, public std::enable_shared_from_this<IfStmt> {
+
+    const std::shared_ptr<Expr> condition;
+    const std::shared_ptr<Stmt> then;
+    const std::shared_ptr<Stmt> otherwise;
+
+    IfStmt(const std::shared_ptr<Expr> condition, const std::shared_ptr<Stmt> then, const std::shared_ptr<Stmt> otherwise) :
+        condition(condition), then(then), otherwise(otherwise) {}
+
+    void accept(StmtVisitor& visitor) override {
+        return visitor.visit_if_stmt(shared_from_this());
     }
 
 };

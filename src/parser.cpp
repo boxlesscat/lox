@@ -111,6 +111,8 @@ std::shared_ptr<lox::Stmt> lox::Parser::statement() {
         return print_statement();
     if (match({LEFT_CURLY}))
         return std::make_shared<BlockStmt>(block());
+    if (match({IF}))
+        return if_statement();
     return expression_statement();
 }
 
@@ -121,6 +123,17 @@ std::shared_ptr<std::vector<std::shared_ptr<lox::Stmt>>> lox::Parser::block() {
         statements -> emplace_back(declaration());
     consume(RIGHT_CURLY, "Expected '{' after block");
     return statements;
+}
+
+std::shared_ptr<lox::Stmt> lox::Parser::if_statement() {
+    consume(LEFT_PAREN, "Expected '(' after if");
+    std::shared_ptr<Expr> condition = expression();
+    consume(RIGHT_PAREN, "Expected ')' after condition");
+    std::shared_ptr<Stmt> then = statement();
+    std::shared_ptr<Stmt> otherwise = nullptr;
+    if (match({ELSE}))
+        otherwise = statement();
+    return std::make_shared<IfStmt>(condition, then, otherwise);
 }
 
 std::shared_ptr<lox::Stmt> lox::Parser::print_statement() {

@@ -137,6 +137,13 @@ void lox::Interpreter::visit_block_stmt(const std::shared_ptr<lox::BlockStmt> st
     execute_block(statement -> statements, std::make_shared<Environment>(environment));
 }
 
+void lox::Interpreter::visit_if_stmt(const std::shared_ptr<lox::IfStmt> statement) {
+    if (is_truthy(evaluate(statement -> condition)))
+        execute(statement -> then);
+    else
+        execute(statement -> otherwise);
+}
+
 void lox::Interpreter::visit_print_stmt(const std::shared_ptr<lox::PrintStmt> statement) {
     std::any value = evaluate(statement -> expr);
     std::cout << stringfy(value) << "\n";
