@@ -1,6 +1,8 @@
 #include "interpreter.hpp"
 #include "error.hpp"
 #include "lox_function.hpp"
+#include "return.hpp"
+
 
 bool lox::Interpreter::is_truthy(const std::any value) const {
     const auto& type = value.type();
@@ -50,8 +52,8 @@ void lox::Interpreter::execute_block(const std::shared_ptr<std::vector<std::shar
         this -> environment = environment;
         for (auto statement : *statements)
             execute(statement);
-    } catch (RuntimeError) {
-
+    } catch  (RuntimeError) {
+        // do nothing
     } catch (...) {
         this -> environment = previous;
         throw;
@@ -193,6 +195,10 @@ void lox::Interpreter::visit_var_stmt(const std::shared_ptr<lox::VarStmt> statem
     if (statement -> initializer != nullptr)
         value = evaluate(statement -> initializer);
     environment -> define(statement -> name, value);
+}
+
+void lox::Interpreter::visit_return_stmt(const std::shared_ptr<lox::ReturnStmt> statement) {
+    throw Return(evaluate(statement -> value));
 }
 
 void lox::Interpreter::visit_while_stmt(const std::shared_ptr<lox::WhileStmt> statement) {

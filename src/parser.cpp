@@ -176,6 +176,8 @@ std::shared_ptr<lox::Stmt> lox::Parser::statement() {
         return while_statement();
     if (match({FOR}))
         return for_statement();
+    if (match({RETURN}))
+        return return_statement();
     return expression_statement();
 }
 
@@ -184,7 +186,7 @@ std::shared_ptr<std::vector<std::shared_ptr<lox::Stmt>>> lox::Parser::block() {
     std::shared_ptr<vec> statements = std::make_shared<vec>();
     while (!check(RIGHT_CURLY) and !end())
         statements -> emplace_back(declaration());
-    consume(RIGHT_CURLY, "Expected '{' after block");
+    consume(RIGHT_CURLY, "Expected '}' after block");
     return statements;
 }
 
@@ -246,6 +248,12 @@ std::shared_ptr<lox::Stmt> lox::Parser::expression_statement() {
     std::shared_ptr<Expr> value = expression();
     consume(SEMICOLON, "Expected ';' after value");
     return std::make_shared<ExprStmt>(value);
+}
+
+std::shared_ptr<lox::Stmt> lox::Parser::return_statement() {
+    std::shared_ptr<Expr> expr = expression();
+    consume(SEMICOLON, "Expected ';' after value");
+    return std::make_shared<ReturnStmt>(expr);
 }
 
 std::shared_ptr<lox::Stmt> lox::Parser::while_statement() {

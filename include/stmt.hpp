@@ -12,6 +12,7 @@ struct IfStmt;
 struct VarStmt;
 struct PrintStmt;
 struct ExprStmt;
+struct ReturnStmt;
 struct WhileStmt;
 
 struct StmtVisitor {
@@ -21,6 +22,7 @@ struct StmtVisitor {
     virtual void visit_var_stmt(const std::shared_ptr<VarStmt>) = 0;
     virtual void visit_print_stmt(const std::shared_ptr<PrintStmt>) = 0;
     virtual void visit_expr_stmt(const std::shared_ptr<ExprStmt>) = 0;
+    virtual void visit_return_stmt(const std::shared_ptr<ReturnStmt>) = 0;
     virtual void visit_while_stmt(const std::shared_ptr<WhileStmt>) = 0;
 };
 
@@ -103,6 +105,18 @@ struct ExprStmt : Stmt, public std::enable_shared_from_this<ExprStmt> {
 
     void accept(StmtVisitor& visitor) override {
         visitor.visit_expr_stmt(shared_from_this());
+    }
+
+};
+
+struct ReturnStmt : Stmt, public std::enable_shared_from_this<ReturnStmt> {
+
+    const std::shared_ptr<Expr> value;
+
+    ReturnStmt(const std::shared_ptr<Expr> value) : value(value) {}
+
+    void accept(StmtVisitor& visitor) {
+        visitor.visit_return_stmt(shared_from_this());
     }
 
 };
