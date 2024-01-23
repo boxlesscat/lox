@@ -45,6 +45,7 @@ private:
     void visit_while_stmt(const std::shared_ptr<WhileStmt>) override;
 
 public:
+    Interpreter();
     void execute_block(const std::shared_ptr<std::vector<std::shared_ptr<Stmt>>>, std::shared_ptr<Environment>);
     void interpret(const std::vector<std::shared_ptr<Stmt>>&);
     std::string stringfy(const std::any) const;
