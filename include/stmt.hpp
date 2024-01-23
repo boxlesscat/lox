@@ -7,6 +7,7 @@
 namespace lox {
 
 struct BlockStmt;
+struct FnStmt;
 struct IfStmt;
 struct VarStmt;
 struct PrintStmt;
@@ -15,6 +16,7 @@ struct WhileStmt;
 
 struct StmtVisitor {
     virtual void visit_block_stmt(const std::shared_ptr<BlockStmt>) = 0;
+    virtual void visit_fn_stmt(const std::shared_ptr<FnStmt>) {};
     virtual void visit_if_stmt(const std::shared_ptr<IfStmt>) = 0;
     virtual void visit_var_stmt(const std::shared_ptr<VarStmt>) = 0;
     virtual void visit_print_stmt(const std::shared_ptr<PrintStmt>) = 0;
@@ -34,6 +36,21 @@ struct BlockStmt : Stmt, public std::enable_shared_from_this<BlockStmt> {
 
     void accept(StmtVisitor& visitor) override {
         visitor.visit_block_stmt(shared_from_this());
+    }
+
+};
+
+struct FnStmt : Stmt, public std::enable_shared_from_this<FnStmt> {
+
+    const Token name;
+    const std::shared_ptr<std::vector<Token>> params;
+    const std::shared_ptr<std::vector<std::shared_ptr<Stmt>>> body;
+
+    FnStmt(const Token name, const std::shared_ptr<std::vector<Token>> params, const std::shared_ptr<std::vector<std::shared_ptr<Stmt>>> body) :
+        name(name), params(params), body(body) {}
+
+    void accept(StmtVisitor& visitor) override {
+        visitor.visit_fn_stmt(shared_from_this());
     }
 
 };

@@ -28,6 +28,7 @@ class Parser {
     std::shared_ptr<Expr> primary();
 
     std::shared_ptr<Stmt> declaration();
+    std::shared_ptr<Stmt> function(const std::string);
     std::shared_ptr<Stmt> var_declaration();
     std::shared_ptr<Stmt> statement();
     std::shared_ptr<Stmt> for_statement();
