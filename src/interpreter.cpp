@@ -75,8 +75,8 @@ void lox::Interpreter::execute_block(const std::shared_ptr<std::vector<std::shar
         this -> environment = environment;
         for (auto statement : *statements)
             execute(statement);
-    } catch  (RuntimeError) {
-        // do nothing
+    } catch  (RuntimeError error) {
+        runtime_error(error);
     } catch (...) {
         this -> environment = previous;
         throw;
