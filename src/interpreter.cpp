@@ -2,7 +2,30 @@
 #include "error.hpp"
 #include "lox_function.hpp"
 #include "return.hpp"
+#include <chrono>
 
+
+struct Clock :  public lox::LoxCallable {
+
+    size_t arity() override {
+        return 0;
+    }
+
+    std::any call(lox::Interpreter& interpreter, std::shared_ptr<std::vector<std::any>> args) override {
+        auto ticks = std::chrono::system_clock::now().time_since_epoch();
+        return std::chrono::duration<double>(ticks).count();
+    }
+
+    std::string to_string() {
+        return "<fn clock>";
+    }
+
+};
+
+lox::Interpreter::Interpreter() {
+    std::shared_ptr<LoxCallable> clk = std::make_shared<Clock>();
+    globals -> define(Token(END, "clock", nullptr, -1), clk);
+}
 
 bool lox::Interpreter::is_truthy(const std::any value) const {
     const auto& type = value.type();
@@ -117,9 +140,13 @@ std::any lox::Interpreter::visit_binary_expr(const std::shared_ptr<lox::BinaryEx
 
 std::any lox::Interpreter::visit_call_expr(const std::shared_ptr<lox::CallExpr> expr) {
     std::any callee = evaluate(expr -> callee);
-    if (callee.type() != typeid(std::shared_ptr<LoxFunction>))
+    std::shared_ptr<LoxCallable> function;
+    if (callee.type() == typeid(std::shared_ptr<LoxFunction>))
+        function = std::any_cast<std::shared_ptr<LoxFunction>>(callee);
+    else if (callee.type() == typeid(std::shared_ptr<LoxCallable>))
+        function = std::any_cast<std::shared_ptr<LoxCallable>>(callee);
+    else
         throw RuntimeError(expr -> paren, "Can only call functions and methods");
-    std::shared_ptr<LoxCallable> function = std::any_cast<std::shared_ptr<LoxFunction>>(callee);
     if (expr -> arguments -> size() != function -> arity())
         throw RuntimeError(expr -> paren, "Expected " + std::to_string(function -> arity()) + " arguments but got "
                                                       + std::to_string(expr -> arguments -> size()));
