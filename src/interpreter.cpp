@@ -1,5 +1,6 @@
 #include "interpreter.hpp"
 #include "error.hpp"
+#include "lox_callable.hpp"
 
 
 bool lox::Interpreter::is_truthy(const std::any value) const {
@@ -106,6 +107,17 @@ std::any lox::Interpreter::visit_binary_expr(const std::shared_ptr<lox::BinaryEx
                 return std::any_cast<std::string>(left) + std::any_cast<std::string>(right);
             throw RuntimeError(expr -> op, "Operands must be both numbers or strings");
     }
+    return nullptr;
+}
+
+std::any lox::Interpreter::visit_call_expr(const std::shared_ptr<lox::CallExpr> expr) {
+    std::any callee = evaluate(expr -> callee);
+    if (typeid(callee) != typeid(std::shared_ptr<LoxCallable>))
+        throw RuntimeError(expr -> paren, "Can only call functions and methods");
+    std::shared_ptr<LoxCallable> function = std::any_cast<std::shared_ptr<LoxCallable>>(callee);
+    if (expr -> arguments -> size() != function -> arity())
+        throw RuntimeError(expr -> paren, "Expected " + std::to_string(function -> arity()) + " arguemnts but got "
+                                                      + std::to_string(expr -> arguments -> size()));
     return nullptr;
 }
 
