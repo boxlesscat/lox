@@ -50,8 +50,12 @@ void lox::Interpreter::execute_block(const std::shared_ptr<std::vector<std::shar
         this -> environment = environment;
         for (auto statement : *statements)
             execute(statement);
-    } catch(RuntimeError) {}
-    this -> environment = previous;
+    } catch (RuntimeError) {
+
+    } catch (...) {
+        this -> environment = previous;
+        throw;
+    }
 }
 
 std::any lox::Interpreter::evaluate(const std::shared_ptr<lox::Expr> expr) {
@@ -171,7 +175,7 @@ void lox::Interpreter::visit_fn_stmt(const std::shared_ptr<lox::FnStmt> statemen
 void lox::Interpreter::visit_if_stmt(const std::shared_ptr<lox::IfStmt> statement) {
     if (is_truthy(evaluate(statement -> condition)))
         execute(statement -> then);
-    else
+    else if (statement -> otherwise != nullptr)
         execute(statement -> otherwise);
 }
 
