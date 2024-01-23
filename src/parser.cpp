@@ -130,6 +130,8 @@ std::shared_ptr<lox::Expr> lox::Parser::primary() {
 
 std::shared_ptr<lox::Stmt> lox::Parser::declaration() {
     try {
+        if (match({FUN}))
+            return function("function");
         if (match({VAR}))
             return var_declaration();
         return statement();
@@ -137,6 +139,23 @@ std::shared_ptr<lox::Stmt> lox::Parser::declaration() {
         synchronize();
         return nullptr;
     }
+}
+
+std::shared_ptr<lox::Stmt> lox::Parser::function(const std::string kind) {
+    const Token name = consume(IDENTIFIER, "Expected " + kind + " name");
+    consume(LEFT_PAREN, "Expected '(' after " + kind + " name");
+    std::shared_ptr<std::vector<Token>> params = std::make_shared<std::vector<Token>>();
+    if (!check(RIGHT_PAREN)) {
+        do {
+            if (params -> size() == 255)
+                error(peek(), "Can't have more than 255 parameters");
+            params -> emplace_back(consume(IDENTIFIER, "Expected parameter name"));
+        } while (match({COMMA}));
+    }
+    consume(RIGHT_PAREN, "Expected ')' after parameters");
+    consume(LEFT_CURLY, "Expected '{' before " + kind + " body");
+    std::shared_ptr<std::vector<std::shared_ptr<Stmt>>> body = block();
+    return std::make_shared<FnStmt>(name, params, body);
 }
 
 std::shared_ptr<lox::Stmt> lox::Parser::var_declaration() {
