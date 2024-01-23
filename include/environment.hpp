@@ -10,11 +10,10 @@ namespace lox {
 
 class Environment {
 
-
-
-public:
     std::unordered_map<std::string, std::any> values;
     const std::shared_ptr<Environment> enclosing;
+    
+public:
 
     Environment(const std::shared_ptr<Environment> enclosing = nullptr) : enclosing(enclosing) {}
 

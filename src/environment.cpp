@@ -6,7 +6,7 @@ void lox::Environment::define(const lox::Token name, const std::any value) {
     if (enclosing == nullptr or values.find(name.lexeme) == values.end())
         values[name.lexeme] = value;
     else
-        throw RuntimeError(name, name.lexeme + " already defined");
+        throw RuntimeError(name, name.lexeme + " has already been defined");
 }
 
 void lox::Environment::assign(const lox::Token name, const std::any value) {
