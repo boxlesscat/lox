@@ -170,7 +170,7 @@ void lox::Interpreter::visit_block_stmt(const std::shared_ptr<lox::BlockStmt> st
 }
 
 void lox::Interpreter::visit_fn_stmt(const std::shared_ptr<lox::FnStmt> statement) {
-    std::shared_ptr<LoxFunction> function = std::make_shared<LoxFunction>(statement);
+    std::shared_ptr<LoxFunction> function = std::make_shared<LoxFunction>(statement, environment);
     environment -> define(statement -> name, function);
 }
 
