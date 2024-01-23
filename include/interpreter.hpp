@@ -26,6 +26,7 @@ class Interpreter : ExprVisitor, StmtVisitor {
 
     std::any visit_assign_expr(const std::shared_ptr<AssignExpr>) override;
     std::any visit_binary_expr(const std::shared_ptr<BinaryExpr>) override;
+    std::any visit_call_expr(const std::shared_ptr<CallExpr>) override;
     std::any visit_grouping_expr(const std::shared_ptr<GroupingExpr>) override;
     std::any visit_literal_expr(const std::shared_ptr<LiteralExpr>) override;
     std::any visit_logical_expr(const std::shared_ptr<LogicalExpr>) override;

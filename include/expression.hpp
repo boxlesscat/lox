@@ -3,12 +3,14 @@
 
 #include <memory>
 #include "token.hpp"
+#include <vector>
 
 
 namespace lox {
 
 struct AssignExpr;
 struct BinaryExpr;
+struct CallExpr;
 struct GroupingExpr;
 struct LiteralExpr;
 struct LogicalExpr;
@@ -18,6 +20,7 @@ struct VariableExpr;
 struct ExprVisitor {
     virtual std::any visit_assign_expr(const std::shared_ptr<AssignExpr>) = 0;
     virtual std::any visit_binary_expr(const std::shared_ptr<BinaryExpr>) = 0;
+    virtual std::any visit_call_expr(const std::shared_ptr<CallExpr>) = 0;
     virtual std::any visit_grouping_expr(const std::shared_ptr<GroupingExpr>) = 0;
     virtual std::any visit_literal_expr(const std::shared_ptr<LiteralExpr>) = 0;
     virtual std::any visit_logical_expr(const std::shared_ptr<LogicalExpr>) = 0;
@@ -53,6 +56,21 @@ struct BinaryExpr : Expr, public std::enable_shared_from_this<BinaryExpr> {
     
     std::any accept(ExprVisitor& visitor) override {
         return visitor.visit_binary_expr(shared_from_this());
+    }
+
+};
+
+struct CallExpr : Expr, public std::enable_shared_from_this<CallExpr> {
+
+    const std::shared_ptr<Expr> callee;
+    const Token paren;
+    const std::shared_ptr<std::vector<std::shared_ptr<Expr>>> arguments;
+
+    CallExpr(const std::shared_ptr<Expr> callee, Token paren, const std::shared_ptr<std::vector<std::shared_ptr<Expr>>> arguments) :
+        callee(callee), paren(paren), arguments(arguments) {}
+
+    std::any accept(ExprVisitor& visitor) override {
+        return visitor.visit_call_expr(shared_from_this());
     }
 
 };

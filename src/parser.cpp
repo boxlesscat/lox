@@ -84,10 +84,29 @@ std::shared_ptr<lox::Expr> lox::Parser::factor() {
 std::shared_ptr<lox::Expr> lox::Parser::unary() {
     while (match({BANG, MINUS})) {
         Token op = previous();
-        std::shared_ptr<Expr> right = primary();
+        std::shared_ptr<Expr> right = call();
         return std::make_shared<UnaryExpr>(op, right);
     }
-    return primary();
+    return call();
+}
+
+std::shared_ptr<lox::Expr> lox::Parser::call() {
+    std::shared_ptr<lox::Expr> expr = primary();
+    while (match({LEFT_PAREN}))
+        expr = finish_call(expr);
+    return expr;
+}
+
+std::shared_ptr<lox::Expr> lox::Parser::finish_call(const std::shared_ptr<lox::Expr> callee) {
+    std::shared_ptr<std::vector<std::shared_ptr<Expr>>> arguments = std::make_shared<std::vector<std::shared_ptr<Expr>>>();
+    if (!check(RIGHT_PAREN))
+        do {
+            if (arguments -> size() == 255) // to make sure it's printed only once regardless of the number of arguments > 255
+                error(peek(), "Can't have more than 255 arguments");
+            arguments -> emplace_back(expression());
+        }  while (match({COMMA}));
+    Token paren = consume(RIGHT_PAREN, "Expected '(' after arguments");
+    return std::make_shared<CallExpr>(callee, paren, arguments);
 }
 
 std::shared_ptr<lox::Expr> lox::Parser::primary() {
