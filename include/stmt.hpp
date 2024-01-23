@@ -16,7 +16,7 @@ struct WhileStmt;
 
 struct StmtVisitor {
     virtual void visit_block_stmt(const std::shared_ptr<BlockStmt>) = 0;
-    virtual void visit_fn_stmt(const std::shared_ptr<FnStmt>) {};
+    virtual void visit_fn_stmt(const std::shared_ptr<FnStmt>) = 0;
     virtual void visit_if_stmt(const std::shared_ptr<IfStmt>) = 0;
     virtual void visit_var_stmt(const std::shared_ptr<VarStmt>) = 0;
     virtual void visit_print_stmt(const std::shared_ptr<PrintStmt>) = 0;
