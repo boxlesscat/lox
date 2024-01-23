@@ -11,7 +11,10 @@ namespace lox {
 
 class Interpreter : ExprVisitor, StmtVisitor {
 
-    std::shared_ptr<Environment> environment = std::make_shared<Environment>();
+public:
+    std::shared_ptr<Environment> globals = std::make_shared<Environment>();
+private:
+    std::shared_ptr<Environment> environment = globals;
 
     bool is_truthy(const std::any) const;
     bool is_equal(const std::any, const std::any) const;
@@ -20,7 +23,6 @@ class Interpreter : ExprVisitor, StmtVisitor {
     void check_number_operands(const Token, const std::any, const std::any) const;
 
     void execute(const std::shared_ptr<Stmt>);
-    void execute_block(const std::shared_ptr<std::vector<std::shared_ptr<Stmt>>>, std::shared_ptr<Environment>);
     
     std::any evaluate(const std::shared_ptr<Expr>);
 
@@ -34,6 +36,7 @@ class Interpreter : ExprVisitor, StmtVisitor {
     std::any visit_variable_expr(const std::shared_ptr<VariableExpr>) override;
     
     void visit_block_stmt(const std::shared_ptr<BlockStmt>) override;
+    void visit_fn_stmt(const std::shared_ptr<FnStmt>) override;
     void visit_if_stmt(const std::shared_ptr<IfStmt>) override;
     void visit_var_stmt(const std::shared_ptr<VarStmt>) override;
     void visit_print_stmt(const std::shared_ptr<PrintStmt>) override;
@@ -41,6 +44,7 @@ class Interpreter : ExprVisitor, StmtVisitor {
     void visit_while_stmt(const std::shared_ptr<WhileStmt>) override;
 
 public:
+    void execute_block(const std::shared_ptr<std::vector<std::shared_ptr<Stmt>>>, std::shared_ptr<Environment>);
     void interpret(const std::vector<std::shared_ptr<Stmt>>&);
     std::string stringfy(const std::any) const;
 

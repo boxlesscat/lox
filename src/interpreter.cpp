@@ -1,7 +1,6 @@
 #include "interpreter.hpp"
 #include "error.hpp"
-#include "lox_callable.hpp"
-
+#include "lox_function.hpp"
 
 bool lox::Interpreter::is_truthy(const std::any value) const {
     const auto& type = value.type();
@@ -112,13 +111,16 @@ std::any lox::Interpreter::visit_binary_expr(const std::shared_ptr<lox::BinaryEx
 
 std::any lox::Interpreter::visit_call_expr(const std::shared_ptr<lox::CallExpr> expr) {
     std::any callee = evaluate(expr -> callee);
-    if (typeid(callee) != typeid(std::shared_ptr<LoxCallable>))
+    if (callee.type() != typeid(std::shared_ptr<LoxFunction>))
         throw RuntimeError(expr -> paren, "Can only call functions and methods");
-    std::shared_ptr<LoxCallable> function = std::any_cast<std::shared_ptr<LoxCallable>>(callee);
+    std::shared_ptr<LoxCallable> function = std::any_cast<std::shared_ptr<LoxFunction>>(callee);
     if (expr -> arguments -> size() != function -> arity())
-        throw RuntimeError(expr -> paren, "Expected " + std::to_string(function -> arity()) + " arguemnts but got "
+        throw RuntimeError(expr -> paren, "Expected " + std::to_string(function -> arity()) + " arguments but got "
                                                       + std::to_string(expr -> arguments -> size()));
-    return nullptr;
+    std::shared_ptr<std::vector<std::any>> arguments = std::make_shared<std::vector<std::any>>();
+    for (auto args : *expr -> arguments)
+        arguments -> emplace_back(evaluate(args));
+    return function -> call(*this, arguments);
 }
 
 std::any lox::Interpreter::visit_grouping_expr(const std::shared_ptr<lox::GroupingExpr> expr) {
@@ -159,6 +161,11 @@ std::any lox::Interpreter::visit_variable_expr(const std::shared_ptr<lox::Variab
 
 void lox::Interpreter::visit_block_stmt(const std::shared_ptr<lox::BlockStmt> statement) {
     execute_block(statement -> statements, std::make_shared<Environment>(environment));
+}
+
+void lox::Interpreter::visit_fn_stmt(const std::shared_ptr<lox::FnStmt> statement) {
+    std::shared_ptr<LoxFunction> function = std::make_shared<LoxFunction>(statement);
+    environment -> define(statement -> name, function);
 }
 
 void lox::Interpreter::visit_if_stmt(const std::shared_ptr<lox::IfStmt> statement) {
@@ -206,5 +213,7 @@ std::string lox::Interpreter::stringfy(const std::any value) const {
         return std::to_string(std::any_cast<double>(value));
     if (type == typeid(std::string))
         return std::any_cast<std::string>(value);
+    if (type == typeid(std::shared_ptr<LoxFunction>))
+        return std::any_cast<std::shared_ptr<LoxFunction>>(value) -> to_string();
     return "nil";
 }
