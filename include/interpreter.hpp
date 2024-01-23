@@ -41,6 +41,7 @@ private:
     void visit_var_stmt(const std::shared_ptr<VarStmt>) override;
     void visit_print_stmt(const std::shared_ptr<PrintStmt>) override;
     void visit_expr_stmt(const std::shared_ptr<ExprStmt>) override;
+    void visit_return_stmt(const std::shared_ptr<ReturnStmt>) override;
     void visit_while_stmt(const std::shared_ptr<WhileStmt>) override;
 
 public:
