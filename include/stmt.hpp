@@ -112,8 +112,9 @@ struct ExprStmt : Stmt, public std::enable_shared_from_this<ExprStmt> {
 struct ReturnStmt : Stmt, public std::enable_shared_from_this<ReturnStmt> {
 
     const std::shared_ptr<Expr> value;
+    const Token keyword;
 
-    ReturnStmt(const std::shared_ptr<Expr> value) : value(value) {}
+    ReturnStmt(const Token keyword, const std::shared_ptr<Expr> value) : keyword(keyword), value(value) {}
 
     void accept(StmtVisitor& visitor) {
         visitor.visit_return_stmt(shared_from_this());

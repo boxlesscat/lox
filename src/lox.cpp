@@ -5,6 +5,7 @@
 #include "error.hpp"
 #include "parser.hpp"
 #include "interpreter.hpp"
+#include "resolver.hpp"
 
 
 lox::Interpreter interpreter;
@@ -51,6 +52,10 @@ void lox::run(const std::string& source) {
         return;
     Parser parser(tokens);
     std::shared_ptr<std::vector<std::shared_ptr<Stmt>>> statements = parser.parse();
+    if (hadError)
+        return;
+    Resolver resolver(interpreter);
+    resolver.resolve(statements);
     if (hadError)
         return;
     interpreter.interpret(*statements);

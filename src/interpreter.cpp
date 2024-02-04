@@ -188,7 +188,7 @@ std::any lox::Interpreter::visit_unary_expr(const std::shared_ptr<lox::UnaryExpr
 }
 
 std::any lox::Interpreter::visit_variable_expr(const std::shared_ptr<lox::VariableExpr> expr) {
-    return environment -> get(expr -> name);
+    return lookup_variable(expr -> name, expr);
 }
 
 void lox::Interpreter::visit_block_stmt(const std::shared_ptr<lox::BlockStmt> statement) {
@@ -232,6 +232,12 @@ void lox::Interpreter::visit_while_stmt(const std::shared_ptr<lox::WhileStmt> st
         execute(statement -> body);
 }
 
+std::any lox::Interpreter::lookup_variable(const lox::Token name, const std::shared_ptr<lox::Expr> expr) {
+    if (locals.contains(expr))
+        return environment -> get_at(locals[expr], name.lexeme);
+    return globals -> get(name);
+}
+
 void lox::Interpreter::interpret(const std::vector<std::shared_ptr<lox::Stmt>>& statements) {
     try {
         for (auto statement : statements)
@@ -239,6 +245,10 @@ void lox::Interpreter::interpret(const std::vector<std::shared_ptr<lox::Stmt>>& 
     } catch (RuntimeError error) {
         runtime_error(error);
     }
+}
+
+void lox::Interpreter::resolve(const std::shared_ptr<Expr> expr, const int depth) {
+    locals[expr] = depth;
 }
 
 std::string lox::Interpreter::stringfy(const std::any value) const {

@@ -8,7 +8,7 @@
 
 namespace lox {
 
-class Environment {
+struct Environment : public std::enable_shared_from_this<Environment> {
 
     std::unordered_map<std::string, std::any> values;
     const std::shared_ptr<Environment> enclosing;
@@ -19,8 +19,11 @@ public:
 
     void define(const Token, const std::any);
     void assign(const Token, const std::any);
+    void assign_at(const int, Token, std::any);
 
+    std::shared_ptr<Environment> ancestor(const int);
     std::any get(const Token);
+    std::any get_at(const int, std::string);
 
 };
 
