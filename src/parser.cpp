@@ -251,9 +251,12 @@ std::shared_ptr<lox::Stmt> lox::Parser::expression_statement() {
 }
 
 std::shared_ptr<lox::Stmt> lox::Parser::return_statement() {
-    std::shared_ptr<Expr> expr = expression();
+    Token keyword = previous();
+    std::shared_ptr<Expr> expr = nullptr;
+    if (!check(SEMICOLON))
+        expr = expression();
     consume(SEMICOLON, "Expected ';' after value");
-    return std::make_shared<ReturnStmt>(expr);
+    return std::make_shared<ReturnStmt>(keyword, expr);
 }
 
 std::shared_ptr<lox::Stmt> lox::Parser::while_statement() {

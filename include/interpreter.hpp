@@ -15,6 +15,7 @@ public:
     std::shared_ptr<Environment> globals = std::make_shared<Environment>();
 private:
     std::shared_ptr<Environment> environment = globals;
+    std::unordered_map<std::shared_ptr<Expr>, int> locals;
 
     bool is_truthy(const std::any) const;
     bool is_equal(const std::any, const std::any) const;
@@ -44,10 +45,13 @@ private:
     void visit_return_stmt(const std::shared_ptr<ReturnStmt>) override;
     void visit_while_stmt(const std::shared_ptr<WhileStmt>) override;
 
+    std::any lookup_variable(const Token, const std::shared_ptr<Expr>);
+
 public:
     Interpreter();
     void execute_block(const std::shared_ptr<std::vector<std::shared_ptr<Stmt>>>, std::shared_ptr<Environment>);
     void interpret(const std::vector<std::shared_ptr<Stmt>>&);
+    void resolve(const std::shared_ptr<Expr>, const int);
     std::string stringfy(const std::any) const;
 
 };

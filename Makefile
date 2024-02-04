@@ -8,6 +8,7 @@ DEP			:= $(SRC:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.d)
 
 CXX			:= g++
 CPPFLAGS	:= -I $(INC_DIR) -MMD -MP
+CXXFLAGS	:= -std=c++20
 
 
 lox::
@@ -17,7 +18,7 @@ lox:: $(OBJ)
 	$(CXX) $^ -o $@
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
-	$(CXX) -c $< -o $@ $(CPPFLAGS)
+	$(CXX) -c $< -o $@ $(CPPFLAGS) $(CXXFLAGS)
 
 .PHONY clean:
 	-rm -rf build
