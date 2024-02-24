@@ -56,6 +56,11 @@ void lox::Resolver::visit_block_stmt(const std::shared_ptr<lox::BlockStmt> stmt)
     end_scope();
 }
 
+void lox::Resolver::visit_class_stmt(const std::shared_ptr<lox::ClassStmt> stmt) {
+    declare(stmt -> name);
+    define(stmt -> name);
+}
+
 void lox::Resolver::visit_expr_stmt(const std::shared_ptr<lox::ExprStmt> stmt) {
     resolve(stmt -> expr);
 }

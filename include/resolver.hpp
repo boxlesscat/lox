@@ -30,6 +30,7 @@ class Resolver : public ExprVisitor, StmtVisitor {
     void define(const Token);
 
     void visit_block_stmt(const std::shared_ptr<BlockStmt>) override;
+    void visit_class_stmt(const std::shared_ptr<ClassStmt>) override;
     void visit_expr_stmt(const std::shared_ptr<ExprStmt>) override;
     void visit_fn_stmt(const std::shared_ptr<FnStmt>) override;
     void visit_if_stmt(const std::shared_ptr<IfStmt>) override;
