@@ -1,4 +1,5 @@
 *.exe
+*.lox
 *.out
 *.o
 build/**

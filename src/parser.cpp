@@ -128,8 +128,26 @@ std::shared_ptr<lox::Expr> lox::Parser::primary() {
     throw error(peek(), "Expected an expression");
 }
 
+std::shared_ptr<lox::Stmt> lox::Parser::class_declaration() {
+
+    Token name = consume(IDENTIFIER, "Expected class name");
+    consume(LEFT_CURLY, "Expected '{' before class body");
+
+    std::shared_ptr<std::vector<std::shared_ptr<FnStmt>>> methods = std::make_shared<std::vector<std::shared_ptr<FnStmt>>>(std::vector<std::shared_ptr<FnStmt>>());
+
+    while (!check(RIGHT_CURLY) and !end())
+        methods -> emplace_back(function("method"));
+
+    consume(RIGHT_CURLY, "Expected '}' after class body");
+
+    return std::make_shared<ClassStmt>(name, methods);
+
+}
+
 std::shared_ptr<lox::Stmt> lox::Parser::declaration() {
     try {
+        if (match({CLASS}))
+            return class_declaration();
         if (match({FUN}))
             return function("function");
         if (match({VAR}))
@@ -141,7 +159,7 @@ std::shared_ptr<lox::Stmt> lox::Parser::declaration() {
     }
 }
 
-std::shared_ptr<lox::Stmt> lox::Parser::function(const std::string kind) {
+std::shared_ptr<lox::FnStmt> lox::Parser::function(const std::string kind) {
     const Token name = consume(IDENTIFIER, "Expected " + kind + " name");
     consume(LEFT_PAREN, "Expected '(' after " + kind + " name");
     std::shared_ptr<std::vector<Token>> params = std::make_shared<std::vector<Token>>();

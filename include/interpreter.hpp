@@ -4,6 +4,7 @@
 #include "vector"
 #include "environment.hpp"
 #include "expression.hpp"
+#include "loxclass.hpp"
 #include "stmt.hpp"
 
 
@@ -37,6 +38,7 @@ private:
     std::any visit_variable_expr(const std::shared_ptr<VariableExpr>) override;
     
     void visit_block_stmt(const std::shared_ptr<BlockStmt>) override;
+    void visit_class_stmt(const std::shared_ptr<ClassStmt>) override;
     void visit_fn_stmt(const std::shared_ptr<FnStmt>) override;
     void visit_if_stmt(const std::shared_ptr<IfStmt>) override;
     void visit_var_stmt(const std::shared_ptr<VarStmt>) override;

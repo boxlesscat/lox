@@ -7,6 +7,7 @@
 namespace lox {
 
 struct BlockStmt;
+struct ClassStmt;
 struct FnStmt;
 struct IfStmt;
 struct VarStmt;
@@ -17,6 +18,7 @@ struct WhileStmt;
 
 struct StmtVisitor {
     virtual void visit_block_stmt(const std::shared_ptr<BlockStmt>) = 0;
+    virtual void visit_class_stmt(const std::shared_ptr<ClassStmt>) = 0;
     virtual void visit_fn_stmt(const std::shared_ptr<FnStmt>) = 0;
     virtual void visit_if_stmt(const std::shared_ptr<IfStmt>) = 0;
     virtual void visit_var_stmt(const std::shared_ptr<VarStmt>) = 0;
@@ -38,6 +40,19 @@ struct BlockStmt : Stmt, public std::enable_shared_from_this<BlockStmt> {
 
     void accept(StmtVisitor& visitor) override {
         visitor.visit_block_stmt(shared_from_this());
+    }
+
+};
+
+struct ClassStmt : Stmt, public std::enable_shared_from_this<ClassStmt> {
+
+    const std::shared_ptr<std::vector<std::shared_ptr<FnStmt>>> methods;
+    const Token name;
+
+    ClassStmt(const Token name, const std::shared_ptr<std::vector<std::shared_ptr<FnStmt>>> methods) : name(name), methods(methods) {}
+
+    void accept(StmtVisitor& visitor) override {
+        visitor.visit_class_stmt(shared_from_this());
     }
 
 };

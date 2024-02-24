@@ -195,6 +195,11 @@ void lox::Interpreter::visit_block_stmt(const std::shared_ptr<lox::BlockStmt> st
     execute_block(statement -> statements, std::make_shared<Environment>(environment));
 }
 
+void lox::Interpreter::visit_class_stmt(const std::shared_ptr<lox::ClassStmt> statement) {
+    std::shared_ptr<LoxClass> klass = std::make_shared<LoxClass>(statement -> name.lexeme);
+    environment -> define(statement -> name, klass);
+}
+
 void lox::Interpreter::visit_fn_stmt(const std::shared_ptr<lox::FnStmt> statement) {
     std::shared_ptr<LoxFunction> function = std::make_shared<LoxFunction>(statement, environment);
     environment -> define(statement -> name, function);
@@ -261,5 +266,7 @@ std::string lox::Interpreter::stringfy(const std::any value) const {
         return std::any_cast<std::string>(value);
     if (type == typeid(std::shared_ptr<LoxFunction>))
         return std::any_cast<std::shared_ptr<LoxFunction>>(value) -> to_string();
+    if (type == typeid(std::shared_ptr<LoxClass>))
+        return std::any_cast<std::shared_ptr<LoxClass>>(value) -> to_string();
     return "nil";
 }
