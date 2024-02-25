@@ -11,6 +11,7 @@ class Resolver : public ExprVisitor, StmtVisitor {
 
     enum class FunctionType {
         FUNCTION,
+        METHOD,
         NONE,
     };
 
