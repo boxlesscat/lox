@@ -1,6 +1,6 @@
 #include "interpreter.hpp"
 #include "error.hpp"
-#include "loxclass.hpp"
+#include "lox_class.hpp"
 #include "lox_instance.hpp"
 #include "lox_function.hpp"
 #include "return.hpp"
