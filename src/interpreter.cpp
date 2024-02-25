@@ -56,6 +56,10 @@ bool lox::Interpreter::is_equal(const std::any x, const std::any y) const {
         return std::any_cast<std::shared_ptr<LoxInstance>>(x) == std::any_cast<std::shared_ptr<LoxInstance>>(y);
     if (type == typeid(std::shared_ptr<LoxClass>))
         return std::any_cast<std::shared_ptr<LoxClass>>(x) == std::any_cast<std::shared_ptr<LoxClass>>(y);
+    if (type == typeid(std::shared_ptr<LoxCallable>))
+        return std::any_cast<std::shared_ptr<LoxCallable>>(x) == std::any_cast<std::shared_ptr<LoxCallable>>(y);
+    if (type == typeid(std::shared_ptr<LoxFunction>))
+        return std::any_cast<std::shared_ptr<LoxFunction>>(x) == std::any_cast<std::shared_ptr<LoxFunction>>(y);
     return false;
 }
 
@@ -294,5 +298,7 @@ std::string lox::Interpreter::stringfy(const std::any value) const {
         return std::any_cast<std::shared_ptr<LoxClass>>(value) -> to_string();
     if (type == typeid(std::shared_ptr<LoxInstance>))
         return std::any_cast<std::shared_ptr<LoxInstance>>(value) -> to_string();
+    if (type == typeid(std::shared_ptr<LoxCallable>))
+        return std::any_cast<std::shared_ptr<LoxCallable>>(value) -> to_string();
     return "nil";
 }
