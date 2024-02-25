@@ -120,6 +120,11 @@ std::any lox::Resolver::visit_call_expr(const std::shared_ptr<lox::CallExpr> exp
     return nullptr;
 }
 
+std::any lox::Resolver::visit_get_expr(const std::shared_ptr<lox::GetExpr> expr) {
+    resolve(expr -> object);
+    return nullptr;
+}
+
 std::any lox::Resolver::visit_grouping_expr(const std::shared_ptr<lox::GroupingExpr> expr) {
     resolve(expr -> expr);
     return nullptr;
@@ -132,6 +137,12 @@ std::any lox::Resolver::visit_literal_expr(const std::shared_ptr<lox::LiteralExp
 std::any lox::Resolver::visit_logical_expr(const std::shared_ptr<lox::LogicalExpr> expr) {
     resolve(expr -> left);
     resolve(expr -> right);
+    return nullptr;
+}
+
+std::any lox::Resolver::visit_set_expr(const std::shared_ptr<SetExpr> expr) {
+    resolve(expr -> object);
+    resolve(expr -> value);
     return nullptr;
 }
 

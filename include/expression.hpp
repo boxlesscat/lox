@@ -11,9 +11,11 @@ namespace lox {
 struct AssignExpr;
 struct BinaryExpr;
 struct CallExpr;
+struct GetExpr;
 struct GroupingExpr;
 struct LiteralExpr;
 struct LogicalExpr;
+struct SetExpr;
 struct UnaryExpr;
 struct VariableExpr;
 
@@ -21,9 +23,11 @@ struct ExprVisitor {
     virtual std::any visit_assign_expr(const std::shared_ptr<AssignExpr>) = 0;
     virtual std::any visit_binary_expr(const std::shared_ptr<BinaryExpr>) = 0;
     virtual std::any visit_call_expr(const std::shared_ptr<CallExpr>) = 0;
+    virtual std::any visit_get_expr(const std::shared_ptr<GetExpr>) = 0;
     virtual std::any visit_grouping_expr(const std::shared_ptr<GroupingExpr>) = 0;
     virtual std::any visit_literal_expr(const std::shared_ptr<LiteralExpr>) = 0;
     virtual std::any visit_logical_expr(const std::shared_ptr<LogicalExpr>) = 0;
+    virtual std::any visit_set_expr(const std::shared_ptr<SetExpr>) = 0;
     virtual std::any visit_unary_expr(const std::shared_ptr<UnaryExpr>) = 0;
     virtual std::any visit_variable_expr(const std::shared_ptr<VariableExpr>) = 0;
 };
@@ -75,6 +79,19 @@ struct CallExpr : Expr, public std::enable_shared_from_this<CallExpr> {
 
 };
 
+struct GetExpr : Expr, public std::enable_shared_from_this<GetExpr> {
+
+    const std::shared_ptr<Expr> object;
+    const Token name;
+
+    GetExpr(const std::shared_ptr<Expr> object, const Token name) : object(object), name(name) {}
+
+    std::any accept(ExprVisitor& visitor) override {
+        return visitor.visit_get_expr(shared_from_this());
+    }
+
+};
+
 struct GroupingExpr : Expr, public std::enable_shared_from_this<GroupingExpr> {
     
     const std::shared_ptr<Expr> expr;
@@ -112,6 +129,21 @@ struct LogicalExpr : Expr, public std::enable_shared_from_this<LogicalExpr> {
 
     std::any accept(ExprVisitor& visitor) override {
         return visitor.visit_logical_expr(shared_from_this());
+    }
+
+};
+
+struct SetExpr : Expr, public std::enable_shared_from_this<SetExpr> {
+
+    const std::shared_ptr<Expr> object;
+    const std::shared_ptr<Expr> value;
+    const Token name;
+
+    SetExpr(const std::shared_ptr<Expr> object, const std::shared_ptr<Expr> value, const Token name) :
+        object(object), value(value), name(name) {}
+
+    std::any accept(ExprVisitor& visitor) override {
+        return visitor.visit_set_expr(shared_from_this());
     }
 
 };
