@@ -224,7 +224,11 @@ void lox::Interpreter::visit_block_stmt(const std::shared_ptr<lox::BlockStmt> st
 }
 
 void lox::Interpreter::visit_class_stmt(const std::shared_ptr<lox::ClassStmt> statement) {
-    std::shared_ptr<LoxClass> klass = std::make_shared<LoxClass>(statement -> name.lexeme);
+    const std::shared_ptr<std::unordered_map<std::string, std::shared_ptr<LoxFunction>>> methods = std::make_shared<std::unordered_map<std::string, std::shared_ptr<LoxFunction>>>(std::unordered_map<std::string, std::shared_ptr<LoxFunction>>());
+    for (auto method : *statement -> methods) {
+        (*methods)[method -> name.lexeme] = std::make_shared<LoxFunction>(method, environment);
+    }
+    std::shared_ptr<LoxClass> klass = std::make_shared<LoxClass>(statement -> name.lexeme, methods);
     environment -> define(statement -> name, klass);
 }
 
