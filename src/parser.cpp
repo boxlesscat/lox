@@ -12,7 +12,8 @@ std::shared_ptr<lox::Expr> lox::Parser::assignment() {
     if (match({EQUAL})) {
         Token equal = previous();
         std::shared_ptr<lox::Expr> value = assignment();
-        if (typeid(expr) == typeid(std::shared_ptr<VariableExpr>)) {
+        std::shared_ptr<VariableExpr> var = dynamic_pointer_cast<VariableExpr>(expr);
+        if (var != nullptr) {
             Token name = dynamic_pointer_cast<VariableExpr>(expr) -> name;
             return std::make_shared<AssignExpr>(name, value);
         } else {
