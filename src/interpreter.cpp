@@ -52,6 +52,10 @@ bool lox::Interpreter::is_equal(const std::any x, const std::any y) const {
         return std::any_cast<bool>(x) == std::any_cast<bool>(y);
     if (type == typeid(std::string))
         return std::any_cast<std::string>(x) == std::any_cast<std::string>(y);
+    if (type == typeid(std::shared_ptr<LoxInstance>))
+        return std::any_cast<std::shared_ptr<LoxInstance>>(x) == std::any_cast<std::shared_ptr<LoxInstance>>(y);
+    if (type == typeid(std::shared_ptr<LoxClass>))
+        return std::any_cast<std::shared_ptr<LoxClass>>(x) == std::any_cast<std::shared_ptr<LoxClass>>(y);
     return false;
 }
 
@@ -159,6 +163,13 @@ std::any lox::Interpreter::visit_call_expr(const std::shared_ptr<lox::CallExpr> 
     return function -> call(*this, arguments);
 }
 
+std::any lox::Interpreter::visit_get_expr(const std::shared_ptr<lox::GetExpr> expr) {
+    std::any object = evaluate(expr -> object);
+    if (object.type() == typeid(std::shared_ptr<LoxInstance>))
+        return std::any_cast<std::shared_ptr<LoxInstance>>(object) -> get(expr -> name);
+    throw RuntimeError(expr -> name, "Only instances have properties.");
+}
+
 std::any lox::Interpreter::visit_grouping_expr(const std::shared_ptr<lox::GroupingExpr> expr) {
     return evaluate(expr -> expr);
 }
@@ -177,6 +188,15 @@ std::any lox::Interpreter::visit_logical_expr(const std::shared_ptr<lox::Logical
             return left;
     }
     return evaluate(expr -> right);
+}
+
+std::any lox::Interpreter::visit_set_expr(const std::shared_ptr<lox::SetExpr> expr) {
+    std::any object = evaluate(expr -> object);
+    if (object.type() != typeid(std::shared_ptr<LoxInstance>))
+        throw RuntimeError(expr -> name, "Only instances have fields");
+    std::any value = evaluate(expr -> value);
+    std::any_cast<std::shared_ptr<LoxInstance>>(object) -> set(expr -> name, value);
+    return value;
 }
 
 std::any lox::Interpreter::visit_unary_expr(const std::shared_ptr<lox::UnaryExpr> expr) {

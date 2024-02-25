@@ -12,9 +12,13 @@ std::shared_ptr<lox::Expr> lox::Parser::assignment() {
     if (match({EQUAL})) {
         Token equal = previous();
         std::shared_ptr<lox::Expr> value = assignment();
-        if (typeid(*expr) == typeid(VariableExpr)) {
-            Token name = std::dynamic_pointer_cast<VariableExpr>(expr) -> name;
+        if (typeid(expr) == typeid(std::shared_ptr<VariableExpr>)) {
+            Token name = dynamic_pointer_cast<VariableExpr>(expr) -> name;
             return std::make_shared<AssignExpr>(name, value);
+        } else {
+            std::shared_ptr<GetExpr> get = dynamic_pointer_cast<GetExpr>(expr);
+            if (get != nullptr)
+                return std::make_shared<SetExpr>(get -> object, value, get -> name);
         }
         throw error(equal, "Invalid Assignment Target");
     }
@@ -92,8 +96,16 @@ std::shared_ptr<lox::Expr> lox::Parser::unary() {
 
 std::shared_ptr<lox::Expr> lox::Parser::call() {
     std::shared_ptr<lox::Expr> expr = primary();
-    while (match({LEFT_PAREN}))
-        expr = finish_call(expr);
+    while (true) {
+        if (match({LEFT_PAREN})) {
+            expr = finish_call(expr);
+        } else if (match({DOT})) {
+            const Token name = consume(IDENTIFIER, "Expected property name after '.'."); 
+            expr = std::make_shared<GetExpr>(expr, name);
+        } else {
+            break;
+        }
+    }
     return expr;
 }
 
