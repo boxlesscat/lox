@@ -13,9 +13,11 @@ class LoxFunction : public LoxCallable {
     const std::shared_ptr<FnStmt> declaration;
     const std::shared_ptr<Environment> closure;
 
+    bool is_init;
+
 public:
-    LoxFunction(const std::shared_ptr<FnStmt> declaration, const std::shared_ptr<Environment> closure) :
-        declaration(declaration), closure(closure) {}
+    LoxFunction(const std::shared_ptr<FnStmt> declaration, const std::shared_ptr<Environment> closure, bool is_init) :
+        declaration(declaration), closure(closure), is_init(is_init) {}
 
     size_t arity() override;
     std::shared_ptr<LoxFunction> bind(const std::shared_ptr<LoxInstance>);

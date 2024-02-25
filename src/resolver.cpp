@@ -63,8 +63,13 @@ void lox::Resolver::visit_class_stmt(const std::shared_ptr<lox::ClassStmt> stmt)
     define(stmt -> name);
     begin_scope();
     scopes.back()["this"] = true;
+    FunctionType declaration;
     for (auto method : *stmt -> methods) {
-        resolve_function(method, FunctionType::METHOD);
+        if (method -> name.lexeme == "init")
+            declaration = FunctionType::INITIALIZER;
+        else
+            declaration = FunctionType::METHOD;
+        resolve_function(method, declaration);
     }
     end_scope();
     current_class = enclosing_class;
@@ -94,8 +99,12 @@ void lox::Resolver::visit_print_stmt(const std::shared_ptr<lox::PrintStmt> stmt)
 void lox::Resolver::visit_return_stmt(const std::shared_ptr<lox::ReturnStmt> stmt) {
     if (current_function == FunctionType::NONE)
         error(stmt -> keyword, "Can't return from top level code");
-    if (stmt -> value != nullptr)
+    if (stmt -> value != nullptr) {
+        if (current_function == FunctionType::INITIALIZER) {
+            error(stmt -> keyword, "Can't return a value from initializer");
+        }
         resolve(stmt -> value);
+    }
 }
 
 void lox::Resolver::visit_var_stmt(const std::shared_ptr<lox::VarStmt> stmt) {
