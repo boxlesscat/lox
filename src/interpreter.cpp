@@ -228,11 +228,20 @@ void lox::Interpreter::visit_block_stmt(const std::shared_ptr<lox::BlockStmt> st
 }
 
 void lox::Interpreter::visit_class_stmt(const std::shared_ptr<lox::ClassStmt> statement) {
+    std::any superclass = nullptr;
+    std::shared_ptr<LoxClass> superclassptr = nullptr;
+    if (statement -> superclass != nullptr) {
+        superclass = evaluate(statement -> superclass);
+        if (superclass.type() != typeid(std::shared_ptr<LoxClass>))
+            throw RuntimeError(statement -> superclass -> name, "superclass must be a class");
+        else
+            superclassptr = std::any_cast<std::shared_ptr<LoxClass>>(superclass);
+    }
     const std::shared_ptr<std::unordered_map<std::string, std::shared_ptr<LoxFunction>>> methods = std::make_shared<std::unordered_map<std::string, std::shared_ptr<LoxFunction>>>(std::unordered_map<std::string, std::shared_ptr<LoxFunction>>());
     for (auto method : *statement -> methods) {
         (*methods)[method -> name.lexeme] = std::make_shared<LoxFunction>(method, environment, method -> name.lexeme == "init");
     }
-    std::shared_ptr<LoxClass> klass = std::make_shared<LoxClass>(statement -> name.lexeme, methods);
+    std::shared_ptr<LoxClass> klass = std::make_shared<LoxClass>(statement -> name.lexeme, methods, superclassptr);
     environment -> define(statement -> name.lexeme, klass);
 }
 

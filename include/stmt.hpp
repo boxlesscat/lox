@@ -48,8 +48,10 @@ struct ClassStmt : Stmt, public std::enable_shared_from_this<ClassStmt> {
 
     const std::shared_ptr<std::vector<std::shared_ptr<FnStmt>>> methods;
     const Token name;
+    const std::shared_ptr<VariableExpr> superclass;
 
-    ClassStmt(const Token name, const std::shared_ptr<std::vector<std::shared_ptr<FnStmt>>> methods) : name(name), methods(methods) {}
+    ClassStmt(const Token name, const std::shared_ptr<std::vector<std::shared_ptr<FnStmt>>> methods, const std::shared_ptr<VariableExpr> superclass)
+        : name(name), methods(methods), superclass(superclass) {}
 
     void accept(StmtVisitor& visitor) override {
         visitor.visit_class_stmt(shared_from_this());

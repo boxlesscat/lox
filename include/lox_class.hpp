@@ -13,12 +13,14 @@ namespace lox {
 class LoxClass : public LoxCallable, public std::enable_shared_from_this<LoxClass> {
 
     const std::shared_ptr<std::unordered_map<std::string, std::shared_ptr<LoxFunction>>> methods;
+    const std::shared_ptr<LoxClass> superclass;
 
 public:
 
     const std::string name;
 
-    LoxClass(const std::string name, const std::shared_ptr<std::unordered_map<std::string, std::shared_ptr<LoxFunction>>> methods) : name(name), methods(methods) {}
+    LoxClass(const std::string name, const std::shared_ptr<std::unordered_map<std::string, std::shared_ptr<LoxFunction>>> methods, const std::shared_ptr<LoxClass> superclass)
+        : name(name), methods(methods), superclass(superclass) {}
 
     size_t arity() override;
     std::any call(Interpreter&, const std::shared_ptr<std::vector<std::any>>) override;

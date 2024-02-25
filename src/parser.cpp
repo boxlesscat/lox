@@ -146,6 +146,13 @@ std::shared_ptr<lox::Expr> lox::Parser::primary() {
 std::shared_ptr<lox::Stmt> lox::Parser::class_declaration() {
 
     Token name = consume(IDENTIFIER, "Expected class name");
+    std::shared_ptr<VariableExpr> superclass = nullptr;
+
+    if (match({LESSER})) {
+        consume(IDENTIFIER, "Expected superclass name");
+        superclass = std::make_shared<VariableExpr>(previous());
+    }
+
     consume(LEFT_CURLY, "Expected '{' before class body");
 
     std::shared_ptr<std::vector<std::shared_ptr<FnStmt>>> methods = std::make_shared<std::vector<std::shared_ptr<FnStmt>>>(std::vector<std::shared_ptr<FnStmt>>());
@@ -155,7 +162,7 @@ std::shared_ptr<lox::Stmt> lox::Parser::class_declaration() {
 
     consume(RIGHT_CURLY, "Expected '}' after class body");
 
-    return std::make_shared<ClassStmt>(name, methods);
+    return std::make_shared<ClassStmt>(name, methods, superclass);
 
 }
 
