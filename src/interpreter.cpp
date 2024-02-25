@@ -1,5 +1,7 @@
 #include "interpreter.hpp"
 #include "error.hpp"
+#include "loxclass.hpp"
+#include "lox_instance.hpp"
 #include "lox_function.hpp"
 #include "return.hpp"
 #include <chrono>
@@ -142,6 +144,8 @@ std::any lox::Interpreter::visit_call_expr(const std::shared_ptr<lox::CallExpr> 
     std::shared_ptr<LoxCallable> function;
     if (callee.type() == typeid(std::shared_ptr<LoxFunction>))
         function = std::any_cast<std::shared_ptr<LoxFunction>>(callee);
+    else if (callee.type() == typeid(std::shared_ptr<LoxClass>))
+        function = std::any_cast<std::shared_ptr<LoxClass>>(callee);
     else if (callee.type() == typeid(std::shared_ptr<LoxCallable>))
         function = std::any_cast<std::shared_ptr<LoxCallable>>(callee);
     else
@@ -268,5 +272,7 @@ std::string lox::Interpreter::stringfy(const std::any value) const {
         return std::any_cast<std::shared_ptr<LoxFunction>>(value) -> to_string();
     if (type == typeid(std::shared_ptr<LoxClass>))
         return std::any_cast<std::shared_ptr<LoxClass>>(value) -> to_string();
+    if (type == typeid(std::shared_ptr<LoxInstance>))
+        return std::any_cast<std::shared_ptr<LoxInstance>>(value) -> to_string();
     return "nil";
 }
