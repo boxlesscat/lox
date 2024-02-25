@@ -4,7 +4,7 @@
 #include <string>
 #include <unordered_map>
 
-#include "loxclass.hpp"
+#include "lox_class.hpp"
 
 
 namespace lox {
