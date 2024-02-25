@@ -2,19 +2,22 @@
 #define LOXCLASS_HPP
 
 #include <string>
+#include "lox_callable.hpp"
 
 
 namespace lox {
 
-class LoxClass {
-
-    const std::string name;
+class LoxClass : public LoxCallable, public std::enable_shared_from_this<LoxClass> {
 
 public:
 
+    const std::string name;
+
     LoxClass(const std::string name) : name(name) {}
 
-    std::string to_string();
+    size_t arity() override;
+    std::any call(Interpreter&, const std::shared_ptr<std::vector<std::any>>) override;
+    std::string to_string() override;
 
 };
 

@@ -4,7 +4,6 @@
 #include "vector"
 #include "environment.hpp"
 #include "expression.hpp"
-#include "loxclass.hpp"
 #include "stmt.hpp"
 
 
