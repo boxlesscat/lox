@@ -64,8 +64,14 @@ void lox::Resolver::visit_class_stmt(const std::shared_ptr<lox::ClassStmt> stmt)
     if (stmt -> superclass != nullptr)
         if (stmt -> name.lexeme == stmt -> superclass -> name.lexeme)
             error(stmt -> superclass -> name, "A class cannot inherit from itself");
-        else
+        else {
+            current_class = ClassType::SUBCLASS;
             resolve(stmt -> superclass);
+        }
+    if (stmt -> superclass != nullptr) {
+        begin_scope();
+        scopes.back()["super"] = true;
+    }
     begin_scope();
     scopes.back()["this"] = true;
     FunctionType declaration;
@@ -76,6 +82,8 @@ void lox::Resolver::visit_class_stmt(const std::shared_ptr<lox::ClassStmt> stmt)
             declaration = FunctionType::METHOD;
         resolve_function(method, declaration);
     }
+    if (stmt -> superclass != nullptr)
+        end_scope();
     end_scope();
     current_class = enclosing_class;
 }
@@ -166,6 +174,15 @@ std::any lox::Resolver::visit_logical_expr(const std::shared_ptr<lox::LogicalExp
 std::any lox::Resolver::visit_set_expr(const std::shared_ptr<SetExpr> expr) {
     resolve(expr -> object);
     resolve(expr -> value);
+    return nullptr;
+}
+
+std::any lox::Resolver::visit_super_expr(const std::shared_ptr<SuperExpr> expr) {
+    if (current_class == ClassType::NONE)
+        error(expr -> keyword, "Can't use 'super' outside of a class");
+    else if (current_class != ClassType::SUBCLASS)
+        error(expr -> keyword, "Can't use 'super' in class with no subclass");
+    resolve_local(expr, expr -> keyword);
     return nullptr;
 }
 

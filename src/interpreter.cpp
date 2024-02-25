@@ -203,6 +203,16 @@ std::any lox::Interpreter::visit_set_expr(const std::shared_ptr<lox::SetExpr> ex
     return value;
 }
 
+std::any lox::Interpreter::visit_super_expr(const std::shared_ptr<lox::SuperExpr> expr) {
+    const int distance = locals[expr];
+    std::shared_ptr<LoxClass> superclass = std::any_cast<std::shared_ptr<LoxClass>>(environment -> get_at(distance, "super"));
+    std::shared_ptr<LoxInstance> object = std::any_cast<std::shared_ptr<LoxInstance>>(environment -> get_at(distance - 1, "this"));
+    std::shared_ptr<LoxFunction> method = superclass -> find_method(expr -> method.lexeme);
+    if (method == nullptr)
+        throw RuntimeError(expr -> method, "Undefined property '" + expr -> method.lexeme +"'");
+    return method -> bind(object);
+}
+
 std::any lox::Interpreter::visit_this_expr(const std::shared_ptr<lox::ThisExpr> expr) {
     return lookup_variable(expr -> keyword, expr);
 }
@@ -237,11 +247,17 @@ void lox::Interpreter::visit_class_stmt(const std::shared_ptr<lox::ClassStmt> st
         else
             superclassptr = std::any_cast<std::shared_ptr<LoxClass>>(superclass);
     }
+    if (statement -> superclass != nullptr) {
+        environment = std::make_shared<Environment>(environment);
+        environment -> define("super", superclass);
+    }
     const std::shared_ptr<std::unordered_map<std::string, std::shared_ptr<LoxFunction>>> methods = std::make_shared<std::unordered_map<std::string, std::shared_ptr<LoxFunction>>>(std::unordered_map<std::string, std::shared_ptr<LoxFunction>>());
     for (auto method : *statement -> methods) {
         (*methods)[method -> name.lexeme] = std::make_shared<LoxFunction>(method, environment, method -> name.lexeme == "init");
     }
     std::shared_ptr<LoxClass> klass = std::make_shared<LoxClass>(statement -> name.lexeme, methods, superclassptr);
+    if (superclassptr != nullptr)
+        environment = environment -> enclosing;
     environment -> define(statement -> name.lexeme, klass);
 }
 
