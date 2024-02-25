@@ -35,6 +35,7 @@ private:
     std::any visit_literal_expr(const std::shared_ptr<LiteralExpr>) override;
     std::any visit_logical_expr(const std::shared_ptr<LogicalExpr>) override;
     std::any visit_set_expr(const std::shared_ptr<SetExpr>) override;
+    std::any visit_this_expr(const std::shared_ptr<ThisExpr>) override;
     std::any visit_unary_expr(const std::shared_ptr<UnaryExpr>) override;
     std::any visit_variable_expr(const std::shared_ptr<VariableExpr>) override;
     

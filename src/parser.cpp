@@ -138,6 +138,8 @@ std::shared_ptr<lox::Expr> lox::Parser::primary() {
         consume(RIGHT_PAREN, "Expected ')' after expression ");
         return std::make_shared<GroupingExpr>(expr);
     }
+    if (match({THIS}))
+        return std::make_shared<ThisExpr>(previous());
     throw error(peek(), "Expected an expression");
 }
 

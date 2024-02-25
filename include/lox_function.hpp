@@ -6,6 +6,8 @@
 
 namespace lox {
 
+class LoxInstance;
+
 class LoxFunction : public LoxCallable {
 
     const std::shared_ptr<FnStmt> declaration;
@@ -16,6 +18,7 @@ public:
         declaration(declaration), closure(closure) {}
 
     size_t arity() override;
+    std::shared_ptr<LoxFunction> bind(const std::shared_ptr<LoxInstance>);
     std::any call(Interpreter&, std::shared_ptr<std::vector<std::any>>) override;
     std::string to_string() override;
 

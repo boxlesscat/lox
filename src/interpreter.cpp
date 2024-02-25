@@ -26,7 +26,7 @@ struct Clock :  public lox::LoxCallable {
 
 lox::Interpreter::Interpreter() {
     std::shared_ptr<LoxCallable> clk = std::make_shared<Clock>();
-    globals -> define(Token(END, "clock", nullptr, -1), clk);
+    globals -> define("clock", clk);
 }
 
 bool lox::Interpreter::is_truthy(const std::any value) const {
@@ -203,6 +203,10 @@ std::any lox::Interpreter::visit_set_expr(const std::shared_ptr<lox::SetExpr> ex
     return value;
 }
 
+std::any lox::Interpreter::visit_this_expr(const std::shared_ptr<lox::ThisExpr> expr) {
+    return lookup_variable(expr -> keyword, expr);
+}
+
 std::any lox::Interpreter::visit_unary_expr(const std::shared_ptr<lox::UnaryExpr> expr) {
     std::any right = evaluate(expr -> right);
     switch (expr -> op.type) {
@@ -229,12 +233,12 @@ void lox::Interpreter::visit_class_stmt(const std::shared_ptr<lox::ClassStmt> st
         (*methods)[method -> name.lexeme] = std::make_shared<LoxFunction>(method, environment);
     }
     std::shared_ptr<LoxClass> klass = std::make_shared<LoxClass>(statement -> name.lexeme, methods);
-    environment -> define(statement -> name, klass);
+    environment -> define(statement -> name.lexeme, klass);
 }
 
 void lox::Interpreter::visit_fn_stmt(const std::shared_ptr<lox::FnStmt> statement) {
     std::shared_ptr<LoxFunction> function = std::make_shared<LoxFunction>(statement, environment);
-    environment -> define(statement -> name, function);
+    environment -> define(statement -> name.lexeme, function);
 }
 
 void lox::Interpreter::visit_if_stmt(const std::shared_ptr<lox::IfStmt> statement) {
@@ -257,7 +261,7 @@ void lox::Interpreter::visit_var_stmt(const std::shared_ptr<lox::VarStmt> statem
     std::any value = nullptr;
     if (statement -> initializer != nullptr)
         value = evaluate(statement -> initializer);
-    environment -> define(statement -> name, value);
+    environment -> define(statement -> name.lexeme, value);
 }
 
 void lox::Interpreter::visit_return_stmt(const std::shared_ptr<lox::ReturnStmt> statement) {

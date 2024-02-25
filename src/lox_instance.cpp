@@ -7,8 +7,9 @@ std::any lox::LoxInstance::get(const Token name) {
     if (fields.contains(name.lexeme))
         return fields[name.lexeme];
     std::shared_ptr<LoxFunction> method = klass -> find_method(name.lexeme);
-    if (method != nullptr)
-        return method;
+    if (method != nullptr) {
+        return method -> bind(shared_from_this());
+    }
     throw RuntimeError(name, "Undefined Property");
 }
 

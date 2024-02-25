@@ -2,8 +2,8 @@
 #include "error.hpp"
 
 
-void lox::Environment::define(const lox::Token name, const std::any value) {
-    values[name.lexeme] = value;
+void lox::Environment::define(const std::string name, const std::any value) {
+    values[name] = value;
 }
 
 void lox::Environment::assign(const lox::Token name, const std::any value) {

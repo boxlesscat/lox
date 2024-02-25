@@ -9,7 +9,7 @@
 
 namespace lox {
 
-class LoxInstance {
+class LoxInstance : public std::enable_shared_from_this<LoxInstance> {
     
     std::shared_ptr<LoxClass> klass;
     std::unordered_map<std::string, std::any> fields;
