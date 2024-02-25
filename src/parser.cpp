@@ -140,6 +140,12 @@ std::shared_ptr<lox::Expr> lox::Parser::primary() {
     }
     if (match({THIS}))
         return std::make_shared<ThisExpr>(previous());
+    if (match({SUPER})) {
+        Token keyword = previous();
+        consume(DOT, "Expected '.' after super");
+        Token method = consume(IDENTIFIER, "Expected superclass method name");
+        return std::make_shared<SuperExpr>(keyword, method);
+    }
     throw error(peek(), "Expected an expression");
 }
 
