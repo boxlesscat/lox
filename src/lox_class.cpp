@@ -1,4 +1,4 @@
-#include "loxclass.hpp"
+#include "lox_class.hpp"
 #include "lox_function.hpp"
 #include "lox_instance.hpp"
 
@@ -23,6 +23,8 @@ std::shared_ptr<lox::LoxFunction> lox::LoxClass::find_method(const std::string n
     if (methods -> contains(name)) {
         return (*methods)[name];
     }
+    if (superclass != nullptr)
+        return superclass -> find_method(name);
     return nullptr;
 }
 

@@ -61,6 +61,11 @@ void lox::Resolver::visit_class_stmt(const std::shared_ptr<lox::ClassStmt> stmt)
     current_class = ClassType::CLASS;
     declare(stmt -> name);
     define(stmt -> name);
+    if (stmt -> superclass != nullptr)
+        if (stmt -> name.lexeme == stmt -> superclass -> name.lexeme)
+            error(stmt -> superclass -> name, "A class cannot inherit from itself");
+        else
+            resolve(stmt -> superclass);
     begin_scope();
     scopes.back()["this"] = true;
     FunctionType declaration;
