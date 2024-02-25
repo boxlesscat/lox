@@ -16,6 +16,7 @@ struct GroupingExpr;
 struct LiteralExpr;
 struct LogicalExpr;
 struct SetExpr;
+struct ThisExpr;
 struct UnaryExpr;
 struct VariableExpr;
 
@@ -28,6 +29,7 @@ struct ExprVisitor {
     virtual std::any visit_literal_expr(const std::shared_ptr<LiteralExpr>) = 0;
     virtual std::any visit_logical_expr(const std::shared_ptr<LogicalExpr>) = 0;
     virtual std::any visit_set_expr(const std::shared_ptr<SetExpr>) = 0;
+    virtual std::any visit_this_expr(const std::shared_ptr<ThisExpr>) = 0;
     virtual std::any visit_unary_expr(const std::shared_ptr<UnaryExpr>) = 0;
     virtual std::any visit_variable_expr(const std::shared_ptr<VariableExpr>) = 0;
 };
@@ -144,6 +146,18 @@ struct SetExpr : Expr, public std::enable_shared_from_this<SetExpr> {
 
     std::any accept(ExprVisitor& visitor) override {
         return visitor.visit_set_expr(shared_from_this());
+    }
+
+};
+
+struct ThisExpr : Expr, public std::enable_shared_from_this<ThisExpr> {
+
+    const Token keyword;
+
+    ThisExpr(const Token keyword) : keyword(keyword) {}
+
+    std::any accept(ExprVisitor& visitor) override {
+        return visitor.visit_this_expr(shared_from_this());
     }
 
 };

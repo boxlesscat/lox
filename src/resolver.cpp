@@ -57,11 +57,17 @@ void lox::Resolver::visit_block_stmt(const std::shared_ptr<lox::BlockStmt> stmt)
 }
 
 void lox::Resolver::visit_class_stmt(const std::shared_ptr<lox::ClassStmt> stmt) {
+    ClassType enclosing_class = current_class;
+    current_class = ClassType::CLASS;
     declare(stmt -> name);
     define(stmt -> name);
+    begin_scope();
+    scopes.back()["this"] = true;
     for (auto method : *stmt -> methods) {
         resolve_function(method, FunctionType::METHOD);
     }
+    end_scope();
+    current_class = enclosing_class;
 }
 
 void lox::Resolver::visit_expr_stmt(const std::shared_ptr<lox::ExprStmt> stmt) {
@@ -146,6 +152,13 @@ std::any lox::Resolver::visit_logical_expr(const std::shared_ptr<lox::LogicalExp
 std::any lox::Resolver::visit_set_expr(const std::shared_ptr<SetExpr> expr) {
     resolve(expr -> object);
     resolve(expr -> value);
+    return nullptr;
+}
+
+std::any lox::Resolver::visit_this_expr(const std::shared_ptr<ThisExpr> expr) {
+    if (current_class == ClassType::NONE)
+        error(expr -> keyword, "Can't use this outside of a class");
+    resolve_local(expr, expr -> keyword);
     return nullptr;
 }
 

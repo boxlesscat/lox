@@ -17,7 +17,7 @@ public:
 
     Environment(const std::shared_ptr<Environment> enclosing = nullptr) : enclosing(enclosing) {}
 
-    void define(const Token, const std::any);
+    void define(const std::string, const std::any);
     void assign(const Token, const std::any);
     void assign_at(const int, Token, std::any);
 
