@@ -1,17 +1,17 @@
 #ifndef RETURN_HPP
 #define RETURN_HPP
 
+#include "token.hpp"
+
 #include <exception>
-#include <any>
 
 namespace lox {
 
 struct Return : std::exception {
 
-    std::any value;
+    Value value;
 
-    Return(std::any value) : value(value) {}
-
+    Return(Value value) : value(std::move(value)) {}
 };
 
 };

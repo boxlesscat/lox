@@ -1,12 +1,14 @@
-#include <iostream>
-#include <fstream>
 #include "lox.hpp"
-#include "scanner.hpp"
-#include "error.hpp"
-#include "parser.hpp"
-#include "interpreter.hpp"
-#include "resolver.hpp"
 
+#include "error.hpp"
+#include "interpreter.hpp"
+#include "parser.hpp"
+#include "resolver.hpp"
+#include "scanner.hpp"
+
+#include <fstream>
+#include <iostream>
+#include <memory>
 
 lox::Interpreter interpreter;
 
@@ -28,39 +30,41 @@ void lox::run_file(const std::string& path) {
         std::cerr << "No such file or directory\n";
         exit(66);
     }
-    run(std::string(std::istreambuf_iterator<char>(ifs), std::istreambuf_iterator<char>()));
-    if (hadError)
+    const std::string source = std::string(std::istreambuf_iterator<char>(ifs), std::istreambuf_iterator<char>());
+    run(source);
+    if (had_error)
         exit(65);
-    if (hadRuntimeError)
+    if (had_runtime_error)
         exit(70);
 }
 
 void lox::run_prompt() {
     std::string source;
     for (;;) {
-        hadError = false;
+        had_error = false;
         std::cout << ">> ";
+        std::cout.flush();
         std::getline(std::cin, source);
         run(source);
     }
 }
 
 void lox::run(const std::string& source) {
-    Scanner scanner(source);
+    Scanner            scanner(source);
     std::vector<Token> tokens = scanner.scan_tokens();
-    if (hadError)
+    if (had_error)
         return;
-    Parser parser(tokens);
-    std::shared_ptr<std::vector<std::shared_ptr<Stmt>>> statements = parser.parse();
-    if (hadError)
+    Parser                             parser(tokens);
+    std::vector<std::unique_ptr<Stmt>> statements = parser.parse();
+    if (had_error)
         return;
     Resolver resolver(interpreter);
     resolver.resolve(statements);
-    if (hadError)
+    if (had_error)
         return;
-    interpreter.interpret(*statements);
+    interpreter.interpret(statements);
 }
 
-void lox::report(const int line, std::string where, const std::string message) {
+void lox::report(const int line, const std::string& where, const std::string& message) {
     std::cerr << "[line " << line << "] Error" << where << ": " << message << "\n";
 }

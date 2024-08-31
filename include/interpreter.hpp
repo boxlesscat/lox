@@ -1,11 +1,11 @@
 #ifndef INTERPRETER_HPP
 #define INTERPRETER_HPP
 
-#include "vector"
 #include "environment.hpp"
 #include "expression.hpp"
 #include "stmt.hpp"
 
+#include <vector>
 
 namespace lox {
 
@@ -13,52 +13,53 @@ class Interpreter : ExprVisitor, StmtVisitor {
 
 public:
     std::shared_ptr<Environment> globals = std::make_shared<Environment>();
+
 private:
-    std::shared_ptr<Environment> environment = globals;
-    std::unordered_map<std::shared_ptr<Expr>, int> locals;
+    std::shared_ptr<Environment>   environment = globals;
+    std::unordered_map<Expr*, int> locals;
 
-    bool is_truthy(const std::any) const;
-    bool is_equal(const std::any, const std::any) const;
+    bool is_truthy(const Value&) const;
+    bool is_equal(const Value&, const Value&) const;
 
-    void check_number_operand(const Token, const std::any) const;
-    void check_number_operands(const Token, const std::any, const std::any) const;
+    void check_number_operand(const Token&, const Value&) const;
+    void check_number_operands(const Token&, const Value&, const Value&) const;
 
-    void execute(const std::shared_ptr<Stmt>);
-    
-    std::any evaluate(const std::shared_ptr<Expr>);
+    void execute(std::unique_ptr<Stmt>&);
 
-    std::any visit_assign_expr(const std::shared_ptr<AssignExpr>) override;
-    std::any visit_binary_expr(const std::shared_ptr<BinaryExpr>) override;
-    std::any visit_call_expr(const std::shared_ptr<CallExpr>) override;
-    std::any visit_get_expr(const std::shared_ptr<GetExpr>) override;
-    std::any visit_grouping_expr(const std::shared_ptr<GroupingExpr>) override;
-    std::any visit_literal_expr(const std::shared_ptr<LiteralExpr>) override;
-    std::any visit_logical_expr(const std::shared_ptr<LogicalExpr>) override;
-    std::any visit_set_expr(const std::shared_ptr<SetExpr>) override;
-    std::any visit_super_expr(const std::shared_ptr<SuperExpr>) override;
-    std::any visit_this_expr(const std::shared_ptr<ThisExpr>) override;
-    std::any visit_unary_expr(const std::shared_ptr<UnaryExpr>) override;
-    std::any visit_variable_expr(const std::shared_ptr<VariableExpr>) override;
-    
-    void visit_block_stmt(const std::shared_ptr<BlockStmt>) override;
-    void visit_class_stmt(const std::shared_ptr<ClassStmt>) override;
-    void visit_fn_stmt(const std::shared_ptr<FnStmt>) override;
-    void visit_if_stmt(const std::shared_ptr<IfStmt>) override;
-    void visit_var_stmt(const std::shared_ptr<VarStmt>) override;
-    void visit_print_stmt(const std::shared_ptr<PrintStmt>) override;
-    void visit_expr_stmt(const std::shared_ptr<ExprStmt>) override;
-    void visit_return_stmt(const std::shared_ptr<ReturnStmt>) override;
-    void visit_while_stmt(const std::shared_ptr<WhileStmt>) override;
+    Value evaluate(Expr&);
+    Value evaluate(std::unique_ptr<Expr>&);
 
-    std::any lookup_variable(const Token, const std::shared_ptr<Expr>);
+    Value visit(AssignExpr&) override;
+    Value visit(BinaryExpr&) override;
+    Value visit(CallExpr&) override;
+    Value visit(GetExpr&) override;
+    Value visit(GroupingExpr&) override;
+    Value visit(LiteralExpr&) override;
+    Value visit(LogicalExpr&) override;
+    Value visit(SetExpr&) override;
+    Value visit(SuperExpr&) override;
+    Value visit(ThisExpr&) override;
+    Value visit(UnaryExpr&) override;
+    Value visit(VariableExpr&) override;
+
+    void visit(BlockStmt&) override;
+    void visit(ClassStmt&) override;
+    void visit(FnStmt&) override;
+    void visit(IfStmt&) override;
+    void visit(VarStmt&) override;
+    void visit(PrintStmt&) override;
+    void visit(ExprStmt&) override;
+    void visit(ReturnStmt&) override;
+    void visit(WhileStmt&) override;
+
+    Value lookup_variable(const Token&, Expr*);
 
 public:
     Interpreter();
-    void execute_block(const std::shared_ptr<std::vector<std::shared_ptr<Stmt>>>, std::shared_ptr<Environment>);
-    void interpret(const std::vector<std::shared_ptr<Stmt>>&);
-    void resolve(const std::shared_ptr<Expr>, const int);
-    std::string stringfy(const std::any) const;
-
+    void        execute_block(std::vector<std::unique_ptr<Stmt>>&, std::shared_ptr<Environment>);
+    void        interpret(std::vector<std::unique_ptr<Stmt>>&);
+    void        resolve(Expr*, const int);
+    std::string stringfy(const Value&) const;
 };
 
 };

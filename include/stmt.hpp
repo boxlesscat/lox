@@ -3,7 +3,6 @@
 
 #include "expression.hpp"
 
-
 namespace lox {
 
 struct BlockStmt;
@@ -17,142 +16,123 @@ struct ReturnStmt;
 struct WhileStmt;
 
 struct StmtVisitor {
-    virtual void visit_block_stmt(const std::shared_ptr<BlockStmt>) = 0;
-    virtual void visit_class_stmt(const std::shared_ptr<ClassStmt>) = 0;
-    virtual void visit_fn_stmt(const std::shared_ptr<FnStmt>) = 0;
-    virtual void visit_if_stmt(const std::shared_ptr<IfStmt>) = 0;
-    virtual void visit_var_stmt(const std::shared_ptr<VarStmt>) = 0;
-    virtual void visit_print_stmt(const std::shared_ptr<PrintStmt>) = 0;
-    virtual void visit_expr_stmt(const std::shared_ptr<ExprStmt>) = 0;
-    virtual void visit_return_stmt(const std::shared_ptr<ReturnStmt>) = 0;
-    virtual void visit_while_stmt(const std::shared_ptr<WhileStmt>) = 0;
+    virtual void visit(BlockStmt&)  = 0;
+    virtual void visit(ClassStmt&)  = 0;
+    virtual void visit(FnStmt&)     = 0;
+    virtual void visit(IfStmt&)     = 0;
+    virtual void visit(VarStmt&)    = 0;
+    virtual void visit(PrintStmt&)  = 0;
+    virtual void visit(ExprStmt&)   = 0;
+    virtual void visit(ReturnStmt&) = 0;
+    virtual void visit(WhileStmt&)  = 0;
 };
 
 struct Stmt {
     virtual void accept(StmtVisitor&) = 0;
 };
 
-struct BlockStmt : Stmt, public std::enable_shared_from_this<BlockStmt> {
+struct BlockStmt : Stmt {
+    std::vector<std::unique_ptr<Stmt>> statements;
 
-    const std::shared_ptr<std::vector<std::shared_ptr<Stmt>>> statements;
-
-    BlockStmt(const std::shared_ptr<std::vector<std::shared_ptr<Stmt>>> statements) : statements(statements) {}
-
-    void accept(StmtVisitor& visitor) override {
-        visitor.visit_block_stmt(shared_from_this());
-    }
-
-};
-
-struct ClassStmt : Stmt, public std::enable_shared_from_this<ClassStmt> {
-
-    const std::shared_ptr<std::vector<std::shared_ptr<FnStmt>>> methods;
-    const Token name;
-    const std::shared_ptr<VariableExpr> superclass;
-
-    ClassStmt(const Token name, const std::shared_ptr<std::vector<std::shared_ptr<FnStmt>>> methods, const std::shared_ptr<VariableExpr> superclass)
-        : name(name), methods(methods), superclass(superclass) {}
+    BlockStmt(std::vector<std::unique_ptr<Stmt>> statements) : statements(std::move(statements)) {}
 
     void accept(StmtVisitor& visitor) override {
-        visitor.visit_class_stmt(shared_from_this());
+        visitor.visit(*this);
     }
-
 };
 
-struct FnStmt : Stmt, public std::enable_shared_from_this<FnStmt> {
+struct ClassStmt : Stmt {
+    std::vector<std::unique_ptr<FnStmt>> methods;
+    Token                                name;
+    std::unique_ptr<VariableExpr>        superclass;
 
-    const Token name;
-    const std::shared_ptr<std::vector<Token>> params;
-    const std::shared_ptr<std::vector<std::shared_ptr<Stmt>>> body;
-
-    FnStmt(const Token name, const std::shared_ptr<std::vector<Token>> params, const std::shared_ptr<std::vector<std::shared_ptr<Stmt>>> body) :
-        name(name), params(params), body(body) {}
+    ClassStmt(Token name, std::vector<std::unique_ptr<FnStmt>> methods, std::unique_ptr<VariableExpr> superclass)
+        : name(std::move(name)), methods(std::move(methods)), superclass(std::move(superclass)) {}
 
     void accept(StmtVisitor& visitor) override {
-        visitor.visit_fn_stmt(shared_from_this());
+        visitor.visit(*this);
     }
-
 };
 
-struct IfStmt : Stmt, public std::enable_shared_from_this<IfStmt> {
+struct ExprStmt : Stmt {
+    std::unique_ptr<Expr> expr;
 
-    const std::shared_ptr<Expr> condition;
-    const std::shared_ptr<Stmt> then;
-    const std::shared_ptr<Stmt> otherwise;
-
-    IfStmt(const std::shared_ptr<Expr> condition, const std::shared_ptr<Stmt> then, const std::shared_ptr<Stmt> otherwise) :
-        condition(condition), then(then), otherwise(otherwise) {}
+    ExprStmt(std::unique_ptr<Expr> expr) : expr(std::move(expr)) {}
 
     void accept(StmtVisitor& visitor) override {
-        visitor.visit_if_stmt(shared_from_this());
+        visitor.visit(*this);
     }
-
 };
 
-struct VarStmt : Stmt, public std::enable_shared_from_this<VarStmt> {
-    
-    const Token name;
-    const std::shared_ptr<Expr> initializer;
+struct FnStmt : Stmt {
+    Token                              name;
+    std::vector<Token>                 params;
+    std::vector<std::unique_ptr<Stmt>> body;
 
-    VarStmt(const Token name, const std::shared_ptr<Expr> initializer) : name(name), initializer(initializer) {}
+    FnStmt(Token name, std::vector<Token> params, std::vector<std::unique_ptr<Stmt>> body)
+        : name(std::move(name)), params(std::move(params)), body(std::move(body)) {}
 
     void accept(StmtVisitor& visitor) override {
-        visitor.visit_var_stmt(shared_from_this());
+        visitor.visit(*this);
     }
-
 };
 
-struct PrintStmt : Stmt, public std::enable_shared_from_this<PrintStmt> {
+struct IfStmt : Stmt {
+    std::unique_ptr<Expr> condition;
+    std::unique_ptr<Stmt> then;
+    std::unique_ptr<Stmt> otherwise;
 
-    const std::shared_ptr<Expr> expr;
-
-    PrintStmt(const std::shared_ptr<Expr> expr) : expr(expr) {}
+    IfStmt(std::unique_ptr<Expr> condition, std::unique_ptr<Stmt> then, std::unique_ptr<Stmt> otherwise)
+        : condition(std::move(condition)), then(std::move(then)), otherwise(std::move(otherwise)) {}
 
     void accept(StmtVisitor& visitor) override {
-        visitor.visit_print_stmt(shared_from_this());
+        visitor.visit(*this);
     }
-
 };
 
-struct ExprStmt : Stmt, public std::enable_shared_from_this<ExprStmt> {
+struct PrintStmt : Stmt {
+    std::unique_ptr<Expr> expr;
 
-    const std::shared_ptr<Expr> expr;
-    
-    ExprStmt(const std::shared_ptr<Expr> expr) : expr(expr) {}
+    PrintStmt(std::unique_ptr<Expr> expr) : expr(std::move(expr)) {}
 
     void accept(StmtVisitor& visitor) override {
-        visitor.visit_expr_stmt(shared_from_this());
+        visitor.visit(*this);
     }
-
 };
 
-struct ReturnStmt : Stmt, public std::enable_shared_from_this<ReturnStmt> {
+struct ReturnStmt : Stmt {
+    std::unique_ptr<Expr> value;
+    Token                 keyword;
 
-    const std::shared_ptr<Expr> value;
-    const Token keyword;
+    ReturnStmt(Token keyword, std::unique_ptr<Expr> value) : keyword(std::move(keyword)), value(std::move(value)) {}
 
-    ReturnStmt(const Token keyword, const std::shared_ptr<Expr> value) : keyword(keyword), value(value) {}
-
-    void accept(StmtVisitor& visitor) {
-        visitor.visit_return_stmt(shared_from_this());
-    }
-
-};
-
-struct WhileStmt : Stmt, public std::enable_shared_from_this<WhileStmt> {
-
-    const std::shared_ptr<Expr> condition;
-    const std::shared_ptr<Stmt> body;
-
-    WhileStmt(const std::shared_ptr<Expr> condition, const std::shared_ptr<Stmt> body) :
-        condition(condition), body(body) {}
-    
     void accept(StmtVisitor& visitor) override {
-        visitor.visit_while_stmt(shared_from_this());
+        visitor.visit(*this);
     }
-
 };
 
+struct VarStmt : Stmt {
+    Token                 name;
+    std::unique_ptr<Expr> initializer;
+
+    VarStmt(Token name, std::unique_ptr<Expr> initializer) : name(std::move(name)), initializer(std::move(initializer)) {}
+
+    void accept(StmtVisitor& visitor) override {
+        visitor.visit(*this);
+    }
 };
+
+struct WhileStmt : Stmt {
+    std::unique_ptr<Expr> condition;
+    std::unique_ptr<Stmt> body;
+
+    WhileStmt(std::unique_ptr<Expr> condition, std::unique_ptr<Stmt> body) : condition(std::move(condition)), body(std::move(body)) {}
+
+    void accept(StmtVisitor& visitor) override {
+        visitor.visit(*this);
+    }
+};
+
+}
 
 #endif

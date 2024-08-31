@@ -1,10 +1,10 @@
 #ifndef EXPRESSION_HPP
 #define EXPRESSION_HPP
 
-#include <memory>
 #include "token.hpp"
-#include <vector>
 
+#include <memory>
+#include <vector>
 
 namespace lox {
 
@@ -22,187 +22,160 @@ struct UnaryExpr;
 struct VariableExpr;
 
 struct ExprVisitor {
-    virtual std::any visit_assign_expr(const std::shared_ptr<AssignExpr>) = 0;
-    virtual std::any visit_binary_expr(const std::shared_ptr<BinaryExpr>) = 0;
-    virtual std::any visit_call_expr(const std::shared_ptr<CallExpr>) = 0;
-    virtual std::any visit_get_expr(const std::shared_ptr<GetExpr>) = 0;
-    virtual std::any visit_grouping_expr(const std::shared_ptr<GroupingExpr>) = 0;
-    virtual std::any visit_literal_expr(const std::shared_ptr<LiteralExpr>) = 0;
-    virtual std::any visit_logical_expr(const std::shared_ptr<LogicalExpr>) = 0;
-    virtual std::any visit_set_expr(const std::shared_ptr<SetExpr>) = 0;
-    virtual std::any visit_super_expr(const std::shared_ptr<SuperExpr>) = 0;
-    virtual std::any visit_this_expr(const std::shared_ptr<ThisExpr>) = 0;
-    virtual std::any visit_unary_expr(const std::shared_ptr<UnaryExpr>) = 0;
-    virtual std::any visit_variable_expr(const std::shared_ptr<VariableExpr>) = 0;
+    virtual Value visit(AssignExpr&)   = 0;
+    virtual Value visit(BinaryExpr&)   = 0;
+    virtual Value visit(CallExpr&)     = 0;
+    virtual Value visit(GetExpr&)      = 0;
+    virtual Value visit(GroupingExpr&) = 0;
+    virtual Value visit(LiteralExpr&)  = 0;
+    virtual Value visit(LogicalExpr&)  = 0;
+    virtual Value visit(SetExpr&)      = 0;
+    virtual Value visit(SuperExpr&)    = 0;
+    virtual Value visit(ThisExpr&)     = 0;
+    virtual Value visit(UnaryExpr&)    = 0;
+    virtual Value visit(VariableExpr&) = 0;
 };
 
 struct Expr {
-    virtual std::any accept(ExprVisitor&) = 0;
+    virtual Value accept(ExprVisitor&) = 0;
 };
 
-struct AssignExpr : Expr, public std::enable_shared_from_this<AssignExpr> {
+struct AssignExpr : Expr {
+    Token                 name;
+    std::unique_ptr<Expr> value;
 
-    const Token name;
-    const std::shared_ptr<Expr> value;
+    AssignExpr(Token name, std::unique_ptr<Expr> value) : name(std::move(name)), value(std::move(value)) {}
 
-    AssignExpr(Token name, const std::shared_ptr<Expr> value) : name(std::move(name)), value(value) {}
-
-    std::any accept(ExprVisitor& visitor) override {
-        return visitor.visit_assign_expr(shared_from_this());
+    Value accept(ExprVisitor& visitor) override {
+        return visitor.visit(*this);
     }
-
 };
 
-struct BinaryExpr : Expr, public std::enable_shared_from_this<BinaryExpr> {
-    
-    const std::shared_ptr<Expr> left;
-    const Token op; // operator
-    const std::shared_ptr<Expr> right;
-    
-    BinaryExpr(const std::shared_ptr<Expr> left, Token token, const std::shared_ptr<Expr> right) :
-        left(std::move(left)), op(std::move(token)), right(std::move(right)) {}
-    
-    std::any accept(ExprVisitor& visitor) override {
-        return visitor.visit_binary_expr(shared_from_this());
+struct BinaryExpr : Expr {
+    std::unique_ptr<Expr> left;
+    Token                 op;
+    std::unique_ptr<Expr> right;
+
+    BinaryExpr(std::unique_ptr<Expr> left, Token token, std::unique_ptr<Expr> right)
+        : left(std::move(left)), op(std::move(token)), right(std::move(right)) {}
+
+    Value accept(ExprVisitor& visitor) override {
+        return visitor.visit(*this);
     }
-
 };
 
-struct CallExpr : Expr, public std::enable_shared_from_this<CallExpr> {
+struct CallExpr : Expr {
+    std::unique_ptr<Expr>              callee;
+    Token                              paren;
+    std::vector<std::unique_ptr<Expr>> arguments;
 
-    const std::shared_ptr<Expr> callee;
-    const Token paren;
-    const std::shared_ptr<std::vector<std::shared_ptr<Expr>>> arguments;
+    CallExpr(std::unique_ptr<Expr> callee, Token paren, std::vector<std::unique_ptr<Expr>> arguments)
+        : callee(std::move(callee)), paren(std::move(paren)), arguments(std::move(arguments)) {}
 
-    CallExpr(const std::shared_ptr<Expr> callee, Token paren, const std::shared_ptr<std::vector<std::shared_ptr<Expr>>> arguments) :
-        callee(callee), paren(paren), arguments(arguments) {}
-
-    std::any accept(ExprVisitor& visitor) override {
-        return visitor.visit_call_expr(shared_from_this());
+    Value accept(ExprVisitor& visitor) override {
+        return visitor.visit(*this);
     }
-
 };
 
-struct GetExpr : Expr, public std::enable_shared_from_this<GetExpr> {
+struct GetExpr : Expr {
+    std::unique_ptr<Expr> object;
+    Token                 name;
 
-    const std::shared_ptr<Expr> object;
-    const Token name;
+    GetExpr(std::unique_ptr<Expr> object, Token name) : object(std::move(object)), name(std::move(name)) {}
 
-    GetExpr(const std::shared_ptr<Expr> object, const Token name) : object(object), name(name) {}
-
-    std::any accept(ExprVisitor& visitor) override {
-        return visitor.visit_get_expr(shared_from_this());
+    Value accept(ExprVisitor& visitor) override {
+        return visitor.visit(*this);
     }
-
 };
 
-struct GroupingExpr : Expr, public std::enable_shared_from_this<GroupingExpr> {
-    
-    const std::shared_ptr<Expr> expr;
-    
-    GroupingExpr(const std::shared_ptr<Expr> expr) :
-        expr(std::move(expr)) {}
-    
-    std::any accept(ExprVisitor& visitor) override {
-        return visitor.visit_grouping_expr(shared_from_this());
+struct GroupingExpr : Expr {
+    std::unique_ptr<Expr> expr;
+
+    GroupingExpr(std::unique_ptr<Expr> expr) : expr(std::move(expr)) {}
+
+    Value accept(ExprVisitor& visitor) override {
+        return visitor.visit(*this);
     }
-
 };
 
-struct LiteralExpr : Expr, public std::enable_shared_from_this<LiteralExpr> {
-    
-    const std::any value;
-    
-    LiteralExpr(const std::any value) :
-        value(std::move(value)) {}
-    
-    std::any accept(ExprVisitor& visitor) override {
-        return visitor.visit_literal_expr(shared_from_this());
+struct LiteralExpr : Expr {
+    Value value;
+
+    LiteralExpr(Value value) : value(std::move(value)) {}
+
+    Value accept(ExprVisitor& visitor) override {
+        return visitor.visit(*this);
     }
-
 };
 
-struct LogicalExpr : Expr, public std::enable_shared_from_this<LogicalExpr> {
+struct LogicalExpr : Expr {
+    std::unique_ptr<Expr> left;
+    Token                 op;
+    std::unique_ptr<Expr> right;
 
-    const std::shared_ptr<Expr> left;
-    const Token op; // operator
-    const std::shared_ptr<Expr> right;
+    LogicalExpr(std::unique_ptr<Expr> left, Token op, std::unique_ptr<Expr> right)
+        : left(std::move(left)), op(std::move(op)), right(std::move(right)) {}
 
-    LogicalExpr(const std::shared_ptr<Expr> left, Token op, const std::shared_ptr<Expr> right) :
-        left(left), op(op), right(right) {}
-
-    std::any accept(ExprVisitor& visitor) override {
-        return visitor.visit_logical_expr(shared_from_this());
+    Value accept(ExprVisitor& visitor) override {
+        return visitor.visit(*this);
     }
-
 };
 
-struct SetExpr : Expr, public std::enable_shared_from_this<SetExpr> {
+struct SetExpr : Expr {
+    std::unique_ptr<Expr> object;
+    std::unique_ptr<Expr> value;
+    Token                 name;
 
-    const std::shared_ptr<Expr> object;
-    const std::shared_ptr<Expr> value;
-    const Token name;
+    SetExpr(std::unique_ptr<Expr> object, std::unique_ptr<Expr> value, Token name)
+        : object(std::move(object)), value(std::move(value)), name(std::move(name)) {}
 
-    SetExpr(const std::shared_ptr<Expr> object, const std::shared_ptr<Expr> value, const Token name) :
-        object(object), value(value), name(name) {}
-
-    std::any accept(ExprVisitor& visitor) override {
-        return visitor.visit_set_expr(shared_from_this());
+    Value accept(ExprVisitor& visitor) override {
+        return visitor.visit(*this);
     }
-
 };
 
-struct SuperExpr : Expr, public std::enable_shared_from_this<SuperExpr> {
-    
-    const Token keyword;
-    const Token method;
+struct SuperExpr : Expr {
+    Token keyword;
+    Token method;
 
-    SuperExpr(const Token keyword, const Token method) : keyword(keyword), method(method) {}
+    SuperExpr(Token keyword, Token method) : keyword(std::move(keyword)), method(std::move(method)) {}
 
-    std::any accept(ExprVisitor& visitor) override {
-        return visitor.visit_super_expr(shared_from_this());
+    Value accept(ExprVisitor& visitor) override {
+        return visitor.visit(*this);
     }
-
 };
 
-struct ThisExpr : Expr, public std::enable_shared_from_this<ThisExpr> {
+struct ThisExpr : Expr {
+    Token keyword;
 
-    const Token keyword;
+    ThisExpr(Token keyword) : keyword(std::move(keyword)) {}
 
-    ThisExpr(const Token keyword) : keyword(keyword) {}
-
-    std::any accept(ExprVisitor& visitor) override {
-        return visitor.visit_this_expr(shared_from_this());
+    Value accept(ExprVisitor& visitor) override {
+        return visitor.visit(*this);
     }
-
 };
 
-struct UnaryExpr : Expr, public std::enable_shared_from_this<UnaryExpr> {
-    
-    const Token op; // operator
-    const std::shared_ptr<Expr> right;
-    
-    UnaryExpr(Token token, const std::shared_ptr<Expr> right) :
-        op(std::move(token)), right(std::move(right)) {}
-    
-    std::any accept(ExprVisitor& visitor) override {
-        return visitor.visit_unary_expr(shared_from_this());
+struct UnaryExpr : Expr {
+    Token                 op;
+    std::unique_ptr<Expr> right;
+
+    UnaryExpr(Token token, std::unique_ptr<Expr> right) : op(std::move(token)), right(std::move(right)) {}
+
+    Value accept(ExprVisitor& visitor) override {
+        return visitor.visit(*this);
     }
-
 };
 
-struct VariableExpr : Expr, public std::enable_shared_from_this<VariableExpr> {
-
-    const Token name;
+struct VariableExpr : Expr {
+    Token name;
 
     VariableExpr(Token name) : name(std::move(name)) {}
 
-    std::any accept(ExprVisitor& visitor) override {
-        return visitor.visit_variable_expr(shared_from_this());
+    Value accept(ExprVisitor& visitor) override {
+        return visitor.visit(*this);
     }
-
 };
 
-};
+}
 
 #endif
